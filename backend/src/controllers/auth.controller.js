@@ -129,7 +129,7 @@ export const login = async (req,res) => {
     } 
     catch (error) {
         console.log("Error in login controller:", error);
-        res.status(500).json({message: "Internal server error"});
+        res.status(500).json({message: error?.message || "Internal server error"});
     }
 };
 
@@ -244,7 +244,13 @@ export const resendOTP = async (req,res) => {
 };
 
 export const logout = (_,res) => {
-    res.cookie("jwt","",{maxAge:0});
+    res.cookie("jwt","",{
+        maxAge: 0,
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production" ? true : false,
+    });
     res.status(200).json({message: "Logged out successfully"});
 };
 
