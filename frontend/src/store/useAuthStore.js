@@ -10,10 +10,16 @@ export const useAuthStore = create((set, get) => ({
   isCheckingAuth: true,
   isSigningUp: false,
   isLoggingIn: false,
+  isVerifyingOTP: false,
+  otpEmail: null,
+  otpExpiresAt: null,
   socket: null,
   onlineUsers: [],
 
   setAuthUser: (user) => set({ authUser: user }),
+  setOtpEmail: (email) => set({ otpEmail: email }),
+  setOtpExpiresAt: (otpExpiresAt) => set({ otpExpiresAt }),
+  setIsVerifyingOTP: (isVerifying) => set({ isVerifyingOTP: isVerifying }),
 
   checkAuth: async () => {
     try {
@@ -32,14 +38,14 @@ export const useAuthStore = create((set, get) => ({
     set({ isSigningUp: true });
     try {
       const res = await axiosInstance.post("/auth/signup", data);
-      set({ authUser: res.data });
-
-      toast.success("Account created successfully!");
-      get().connectSocket();
+      set({ authUser: null, otpEmail: null, otpExpiresAt: null });
+      toast.success(res?.data?.message || "Account created successfully! Please sign in.");
+      return true;
     } catch (error) {
       const message = error?.response?.data?.message || "Unable to sign up right now";
       toast.error(message);
       console.log("Signup error:", error);
+      return false;
     } finally {
       set({ isSigningUp: false });
     }
@@ -49,12 +55,12 @@ export const useAuthStore = create((set, get) => ({
     set({ isLoggingIn: true });
     try {
       const res = await axiosInstance.post("/auth/login", data);
-      set({ authUser: res.data });
-      sessionStorage.setItem("chatifyShowWelcome", "1");
-
-      toast.success("Logged in successfully");
-
-      get().connectSocket();
+      // Don't set authUser yet - wait for OTP verification
+      set({
+        otpEmail: res.data.email,
+        otpExpiresAt: res.data.otpExpiresAt || null,
+      });
+      toast.success(res?.data?.message || "OTP sent successfully");
     } catch (error) {
       const message = error?.response?.data?.message || "Unable to log in right now";
       toast.error(message);
@@ -64,10 +70,42 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  verifyOTP: async (email, otp) => {
+    set({ isVerifyingOTP: true });
+    try {
+      const res = await axiosInstance.post("/auth/verify-otp", { email, otp });
+      set({ authUser: res.data, otpEmail: null, otpExpiresAt: null });
+      sessionStorage.setItem("chatifyShowWelcome", "1");
+      toast.success("Logged in successfully");
+      get().connectSocket();
+    } catch (error) {
+      const message = error?.response?.data?.message || "Unable to verify OTP";
+      toast.error(message);
+      console.log("OTP verification error:", error);
+    } finally {
+      set({ isVerifyingOTP: false });
+    }
+  },
+
+  resendOTP: async (email) => {
+    try {
+      const res = await axiosInstance.post("/auth/resend-otp", { email });
+      set({
+        otpEmail: res?.data?.email || email,
+        otpExpiresAt: res?.data?.otpExpiresAt || null,
+      });
+      toast.success(res?.data?.message || "OTP resent successfully");
+    } catch (error) {
+      const message = error?.response?.data?.message || "Unable to resend OTP";
+      toast.error(message);
+      console.log("Resend OTP error:", error);
+    }
+  },
+
   logout: async () => {
     try {
       await axiosInstance.post("/auth/logout");
-      set({ authUser: null });
+      set({ authUser: null, otpEmail: null, otpExpiresAt: null });
       // Clear chat-related localStorage items
       localStorage.removeItem("selectedUser");
       localStorage.removeItem("activeTab");

@@ -56,6 +56,9 @@ export const useChatStore = create((set, get) => ({
   deletedMessageTemp: null,
   unreadCounts: {}, // { senderId: { count, lastMessage, lastMessageTime } }
   typingUsers: {}, // { [userId]: true }
+  unreadListener: null,
+  activeChatMessageListener: null,
+  activeChatTypingClearListener: null,
 
   toggleSound: () => {
     localStorage.setItem("isSoundEnabled", !get().isSoundEnabled);
@@ -329,8 +332,27 @@ export const useChatStore = create((set, get) => ({
     if (!selectedUser) return;
 
     const socket = useAuthStore.getState().socket;
+    if (!socket) return;
 
-    socket.on("newMessage", (newMessage) => {
+    const previousActiveChatListener = get().activeChatMessageListener;
+    const previousTypingClearListener = get().activeChatTypingClearListener;
+
+    if (previousActiveChatListener) {
+      socket.off("newMessage", previousActiveChatListener);
+    }
+    if (previousTypingClearListener) {
+      socket.off("newMessage", previousTypingClearListener);
+    }
+
+    socket.off("message_deleted");
+    socket.off("message_edited");
+    socket.off("scheduled_message_sent");
+    socket.off("messages_seen");
+    socket.off("message_delivered");
+    socket.off("user_typing");
+    socket.off("user_stop_typing");
+
+    const handleNewMessageInActiveChat = (newMessage) => {
       const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id;
       if (!isMessageSentFromSelectedUser) return;
 
@@ -346,7 +368,9 @@ export const useChatStore = create((set, get) => ({
         notificationSound.currentTime = 0; // reset to start
         notificationSound.play().catch((e) => console.log("Audio play failed:", e));
       }
-    });
+    };
+
+    socket.on("newMessage", handleNewMessageInActiveChat);
 
     socket.on("message_deleted", ({ messageId }) => {
       const currentMessages = get().messages;
@@ -440,17 +464,34 @@ export const useChatStore = create((set, get) => ({
       set({ typingUsers: nextTypingUsers });
     });
 
-    socket.on("newMessage", (newMessage) => {
+    const handleTypingClearOnMessage = (newMessage) => {
       if (selectedUser._id !== newMessage.senderId) return;
       const nextTypingUsers = { ...get().typingUsers };
       delete nextTypingUsers[newMessage.senderId];
       set({ typingUsers: nextTypingUsers });
+    };
+
+    socket.on("newMessage", handleTypingClearOnMessage);
+    set({
+      activeChatMessageListener: handleNewMessageInActiveChat,
+      activeChatTypingClearListener: handleTypingClearOnMessage,
     });
   },
 
   unsubscribeFromMessages: () => {
     const socket = useAuthStore.getState().socket;
-    socket.off("newMessage");
+    if (!socket) return;
+
+    const activeChatMessageListener = get().activeChatMessageListener;
+    const activeChatTypingClearListener = get().activeChatTypingClearListener;
+
+    if (activeChatMessageListener) {
+      socket.off("newMessage", activeChatMessageListener);
+    }
+    if (activeChatTypingClearListener) {
+      socket.off("newMessage", activeChatTypingClearListener);
+    }
+
     socket.off("message_deleted");
     socket.off("message_edited");
     socket.off("scheduled_message_sent");
@@ -458,6 +499,7 @@ export const useChatStore = create((set, get) => ({
     socket.off("message_delivered");
     socket.off("user_typing");
     socket.off("user_stop_typing");
+    set({ activeChatMessageListener: null, activeChatTypingClearListener: null });
   },
 
   subscribeToFriendRequests: () => {
@@ -466,6 +508,10 @@ export const useChatStore = create((set, get) => ({
       console.warn("Socket not connected yet");
       return;
     }
+
+    socket.off("incoming_request");
+    socket.off("friend_request_accepted");
+    socket.off("friend_request_rejected");
 
     // listen for new incoming requests
     socket.on("incoming_request", (data) => {
@@ -626,6 +672,8 @@ export const useChatStore = create((set, get) => ({
     const socket = useAuthStore.getState().socket;
     if (!socket) return;
 
+    socket.off("friend_removed");
+
     socket.on("friend_removed", (data) => {
       console.log("Received friend_removed event:", data);
       const { activeTab } = get();
@@ -665,7 +713,7 @@ export const useChatStore = create((set, get) => ({
     const socket = useAuthStore.getState().socket;
     if (!socket) return;
 
-    socket.on("newMessage", (newMessage) => {
+    const handleUnreadUpdate = (newMessage) => {
       const { selectedUser, isSoundEnabled } = get();
       const { authUser } = useAuthStore.getState();
 
@@ -689,15 +737,24 @@ export const useChatStore = create((set, get) => ({
           notificationSound.play().catch((e) => console.log("Audio play failed:", e));
         }
       }
-    });
+
+      // If the active chat is open, keep read receipts synced as soon as message arrives.
+      if (selectedUser && selectedUser._id === newMessage.senderId && newMessage.receiverId === authUser?._id) {
+        axiosInstance.put(`/messages/read/${selectedUser._id}`).catch(() => {});
+      }
+    };
+
+    socket.on("newMessage", handleUnreadUpdate);
+    set({ unreadListener: handleUnreadUpdate });
   },
 
   unsubscribeFromUnreadUpdates: () => {
     const socket = useAuthStore.getState().socket;
-    if (socket) {
-      // Note: Don't remove newMessage here as subscribeToMessages uses it too
-      // The listener handles both cases internally
+    const unreadListener = get().unreadListener;
+    if (socket && unreadListener) {
+      socket.off("newMessage", unreadListener);
     }
+    set({ unreadListener: null });
   },
 }));
 

@@ -81,7 +81,10 @@ export const getIncomingRequests = async (req, res) => {
     console.log("getIncomingRequests - Logged in user:", receiverId?.toString());
 
     // only pending requests for this receiver
-    const requests = await FriendRequest.find({ receiverId, status: 'pending' }).populate('senderId', '-password');
+    const requests = await FriendRequest.find({ receiverId, status: 'pending' })
+      .populate('senderId', 'fullName profilePic email')
+      .sort({ createdAt: -1 })
+      .lean();
     res.status(200).json(requests);
   } catch (error) {
     console.error("getIncomingRequests error:", error);
@@ -257,7 +260,7 @@ export const toggleFavourite = async (req, res) => {
 export const getFavourites = async (req, res) => {
   try {
     const myId = req.user._id;
-    const user = await User.findById(myId).populate('favourites', '-password');
+    const user = await User.findById(myId).populate('favourites', 'fullName profilePic email');
     
     if (!user) return res.status(404).json({ message: "User not found" });
     
@@ -312,7 +315,10 @@ export const getFriendsList = async (req, res) => {
     );
 
     // Fetch full friend details (exclude password)
-    const friends = await User.find({ _id: { $in: activeFriendIds } }).select("-password");
+    const friends = await User.find({ _id: { $in: activeFriendIds } })
+      .select("fullName profilePic email")
+      .sort({ fullName: 1 })
+      .lean();
 
     res.status(200).json(friends);
   } catch (error) {

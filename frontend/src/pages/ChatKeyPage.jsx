@@ -4,7 +4,7 @@ import { ArrowLeft, Key, Copy, Check, Users, Lock, Eye, EyeOff } from "lucide-re
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 
-function ChatKeyPage() {
+function ChatKeyPage({ embedded = false, onBack }) {
   const navigate = useNavigate();
   const [chatKeys, setChatKeys] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,6 +19,13 @@ function ChatKeyPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [passwordError, setPasswordError] = useState("");
+  const handleBack = () => {
+    if (embedded && onBack) {
+      onBack();
+      return;
+    }
+    navigate("/");
+  };
 
   // Check if ChatKey password is set on mount
   useEffect(() => {
@@ -144,7 +151,7 @@ function ChatKeyPage() {
       <div className="feature-card w-full max-w-md p-4 md:p-6 mx-2 relative z-10">
         <div className="flex items-center gap-3 md:gap-4 mb-6">
           <button
-            onClick={() => navigate("/")}
+            onClick={handleBack}
             className="feature-back-btn text-slate-400 hover:text-slate-200 transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center -ml-2"
           >
             <ArrowLeft className="w-6 h-6" />
@@ -224,7 +231,7 @@ function ChatKeyPage() {
       <div className="feature-card w-full max-w-md p-4 md:p-6 mx-2 relative z-10">
         <div className="flex items-center gap-3 md:gap-4 mb-6">
           <button
-            onClick={() => navigate("/")}
+            onClick={handleBack}
             className="feature-back-btn text-slate-400 hover:text-slate-200 transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center -ml-2"
           >
             <ArrowLeft className="w-6 h-6" />
@@ -285,7 +292,7 @@ function ChatKeyPage() {
       {/* Header */}
       <div className="flex items-center gap-3 md:gap-4 mb-6">
         <button
-          onClick={() => navigate("/")}
+          onClick={handleBack}
           className="feature-back-btn text-slate-400 hover:text-slate-200 transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center -ml-2"
         >
           <ArrowLeft className="w-6 h-6" />

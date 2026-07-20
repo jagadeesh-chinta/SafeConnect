@@ -4,7 +4,7 @@ import { ArrowLeft, Users, Download, Eye, RotateCcw, X, Key, Lock } from "lucide
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 
-function RestoreChat() {
+function RestoreChat({ embedded = false, onBack }) {
   const navigate = useNavigate();
   const [deletedChats, setDeletedChats] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,6 +19,13 @@ function RestoreChat() {
   const [keyInputs, setKeyInputs] = useState({}); // { deletedUserId: "enteredKey" }
   const [verifyingKey, setVerifyingKey] = useState(null); // deletedUserId currently being verified
   const [nowMs, setNowMs] = useState(Date.now());
+  const handleBack = () => {
+    if (embedded && onBack) {
+      onBack();
+      return;
+    }
+    navigate("/");
+  };
 
   // Fetch deleted chats on mount
   useEffect(() => {
@@ -162,7 +169,7 @@ function RestoreChat() {
         <div className="mb-4 md:mb-8 flex items-center gap-3">
           <button
             type="button"
-            onClick={() => navigate("/")}
+            onClick={handleBack}
             className="feature-back-btn cursor-pointer relative z-10 flex items-center gap-2 px-3 py-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-lg transition-all min-h-[44px]"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -264,7 +271,7 @@ function RestoreChat() {
               <Users className="w-12 h-12 text-slate-500 mx-auto mb-4 opacity-50" />
               <p className="text-slate-400 mb-4">No deleted chats found</p>
               <button
-                onClick={() => navigate("/")}
+                onClick={handleBack}
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
               >
                 Go to Chats

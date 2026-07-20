@@ -5,11 +5,18 @@ import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { useChatStore } from "../store/useChatStore";
 
-function RequestsPage() {
+function RequestsPage({ embedded = false, onBack }) {
   const navigate = useNavigate();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const { requestsRefreshTrigger } = useChatStore();
+  const handleBack = () => {
+    if (embedded && onBack) {
+      onBack();
+      return;
+    }
+    navigate("/");
+  };
 
   const fetchRequests = async () => {
     setLoading(true);
@@ -60,7 +67,7 @@ function RequestsPage() {
         <div className="mb-4 md:mb-6">
           <button
             type="button"
-            onClick={() => navigate("/")}
+            onClick={handleBack}
             className="feature-back-btn cursor-pointer relative z-10 flex items-center gap-2 px-3 py-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-lg transition-all min-h-[44px]"
           >
             <ArrowLeft className="w-5 h-5" />

@@ -1,18 +1,20 @@
 import { Routes , Route, Navigate, useLocation} from "react-router";
+import { lazy, Suspense } from "react";
 import ChatPage from "./pages/ChatPage";
 import LoginPage from "./pages/LoginPage";
-import RestoreChat from "./pages/RestoreChat";
-import ChatKeyPage from "./pages/ChatKeyPage";
-import ProfilePage from "./pages/ProfilePage";
-import CropProfileImage from "./pages/CropProfileImage";
-import ViewProfileImage from "./pages/ViewProfileImage";
-import NotificationsPage from "./pages/NotificationsPage";
 import WelcomeScreen from "./pages/WelcomeScreen";
-import RequestsPage from "./components/RequestsPage";
 import { useAuthStore } from "./store/useAuthStore";
 import { useEffect } from "react";
 import PageLoader from "./components/PageLoader";
 import {Toaster} from "react-hot-toast";
+
+const RestoreChat = lazy(() => import("./pages/RestoreChat"));
+const ChatKeyPage = lazy(() => import("./pages/ChatKeyPage"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const CropProfileImage = lazy(() => import("./pages/CropProfileImage"));
+const ViewProfileImage = lazy(() => import("./pages/ViewProfileImage"));
+const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
+const RequestsPage = lazy(() => import("./components/RequestsPage"));
 
 function App()
 {
@@ -34,6 +36,24 @@ function App()
     checkAuth();
   },[checkAuth]);
 
+  useEffect(() => {
+    const titleByPath = {
+      "/chat": "Chatify | Chat",
+      "/welcome": "Chatify | Welcome",
+      "/restore-chat": "Chatify | Restore Chat",
+      "/chatkey": "Chatify | ChatKey",
+      "/requests": "Chatify | Friend Requests",
+      "/notifications": "Chatify | Notifications",
+      "/profile": "Chatify | Profile",
+      "/profile/crop": "Chatify | Crop Profile",
+      "/profile/view-image": "Chatify | Profile Image",
+      "/login": "Chatify | Login",
+      "/signup": "Chatify | Sign Up",
+    };
+
+    document.title = titleByPath[location.pathname] || "Chatify";
+  }, [location.pathname]);
+
   if(isCheckingAuth) return <PageLoader />;
 
   return(
@@ -44,23 +64,25 @@ function App()
     <div className="pointer-events-none absolute bottom-0 -right-4 size-96 bg-cyan-500 opacity-20 blur-[100px]" />
   
     <div className="relative z-10 h-full w-full">
-      <Routes>
-        <Route
-          path="/"
-          element={authUser ? (shouldShowWelcome ? <Navigate to="/welcome" replace /> : <Navigate to="/chat" replace />) : <Navigate to={"/login"}/>} 
-        />
-        <Route path="/chat" element={authUser ? <ChatPage /> : <Navigate to={"/login"}/>} />
-        <Route path="/welcome" element={authUser ? <WelcomeScreen /> : <Navigate to={"/login"}/>} />
-        <Route path="/restore-chat" element={authUser ? <RestoreChat /> : <Navigate to={"/login"}/>} />
-        <Route path="/chatkey" element={authUser ? <ChatKeyPage /> : <Navigate to={"/login"}/>} />
-        <Route path="/requests" element={authUser ? <RequestsPage /> : <Navigate to={"/login"}/>} />
-        <Route path="/notifications" element={authUser ? <NotificationsPage /> : <Navigate to={"/login"}/>} />
-        <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to={"/login"}/>} />
-        <Route path="/profile/crop" element={authUser ? <CropProfileImage /> : <Navigate to={"/login"}/>} />
-        <Route path="/profile/view-image" element={authUser ? <ViewProfileImage /> : <Navigate to={"/login"}/>} />
-        <Route path="/login" element={!authUser ? <LoginPage initialMode="signin" /> : <Navigate to={shouldShowWelcome ? "/welcome" : "/chat"} replace />} />
-        <Route path="/signup" element={!authUser ? <LoginPage initialMode="signup" /> : <Navigate to={"/"} />} />
-      </Routes>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route
+            path="/"
+            element={authUser ? (shouldShowWelcome ? <Navigate to="/welcome" replace /> : <Navigate to="/chat" replace />) : <Navigate to={"/login"}/>} 
+          />
+          <Route path="/chat" element={authUser ? <ChatPage /> : <Navigate to={"/login"}/>} />
+          <Route path="/welcome" element={authUser ? <WelcomeScreen /> : <Navigate to={"/login"}/>} />
+          <Route path="/restore-chat" element={authUser ? <RestoreChat /> : <Navigate to={"/login"}/>} />
+          <Route path="/chatkey" element={authUser ? <ChatKeyPage /> : <Navigate to={"/login"}/>} />
+          <Route path="/requests" element={authUser ? <RequestsPage /> : <Navigate to={"/login"}/>} />
+          <Route path="/notifications" element={authUser ? <NotificationsPage /> : <Navigate to={"/login"}/>} />
+          <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to={"/login"}/>} />
+          <Route path="/profile/crop" element={authUser ? <CropProfileImage /> : <Navigate to={"/login"}/>} />
+          <Route path="/profile/view-image" element={authUser ? <ViewProfileImage /> : <Navigate to={"/login"}/>} />
+          <Route path="/login" element={!authUser ? <LoginPage initialMode="signin" /> : <Navigate to={shouldShowWelcome ? "/welcome" : "/chat"} replace />} />
+          <Route path="/signup" element={!authUser ? <LoginPage initialMode="signup" /> : <Navigate to={"/"} />} />
+        </Routes>
+      </Suspense>
 
       <Toaster />
     </div>

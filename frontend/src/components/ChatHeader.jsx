@@ -89,6 +89,7 @@ function ChatHeader({ onViewProfile, onRemoveFriend }) {
         <button 
           onClick={handleBack}
           className="md:hidden ripple-btn chat-btn p-2 -ml-1 rounded-full hover:bg-white/10 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+          aria-label="Back to chat list"
         >
           <ArrowLeft className="w-5 h-5 text-slate-400" />
         </button>
@@ -96,9 +97,10 @@ function ChatHeader({ onViewProfile, onRemoveFriend }) {
         <button 
           onClick={handleProfileClick}
           className={`avatar ${isOnline ? "online" : "offline"} cursor-pointer hover:ring-2 hover:ring-[#00c6ff] rounded-full transition-all`}
+          aria-label={`View ${selectedUser.fullName} profile`}
         >
           <div className="w-10 md:w-12 rounded-full">
-            <img src={selectedUser.profilePic || "/avatar.png"} alt={selectedUser.fullName} />
+            <img src={selectedUser.profilePic || "/avatar.png"} alt={`${selectedUser.fullName} avatar`} loading="lazy" decoding="async" />
           </div>
         </button>
 
@@ -131,6 +133,7 @@ function ChatHeader({ onViewProfile, onRemoveFriend }) {
               onClick={handleToggleFavourite}
               disabled={isLoading}
               className="ripple-btn chat-btn transition-colors cursor-pointer p-2 min-w-[44px] min-h-[44px] rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 flex items-center justify-center"
+              aria-label={isFav ? "Remove from favourites" : "Add to favourites"}
             >
               {isFav ? (
                 <Heart className="w-5 h-5 fill-pink-500 text-pink-500 hover:fill-pink-600 hover:text-pink-600" />
@@ -144,6 +147,7 @@ function ChatHeader({ onViewProfile, onRemoveFriend }) {
               <button
                 onClick={() => setShowMenu(!showMenu)}
                 className="ripple-btn chat-btn p-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center"
+                aria-label="Open chat actions"
               >
                 <MoreVertical className="w-5 h-5 text-slate-400 hover:text-slate-200 transition-colors" />
               </button>

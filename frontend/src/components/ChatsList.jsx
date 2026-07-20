@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import UsersLoadingSkeleton from "./UsersLoadingSkeleton";
 import NoChatsFound from "./NoChatsFound";
@@ -9,6 +9,7 @@ function ChatsList() {
   const { getFavourites, chats, isUsersLoading, setSelectedUser, unreadCounts, selectedUser } = useChatStore();
   const { onlineUsers } = useAuthStore();
   const [lastMessages, setLastMessages] = useState({});
+  const [isFetchingLastMessages, setIsFetchingLastMessages] = useState(false);
 
   useEffect(() => {
     getFavourites();
@@ -17,26 +18,37 @@ function ChatsList() {
   // Fetch last message for each favourite
   useEffect(() => {
     const fetchLastMessages = async () => {
+      setIsFetchingLastMessages(true);
       const messages = {};
-      for (const chat of chats) {
-        try {
-          const res = await axiosInstance.get(`/messages/${chat._id}`);
-          // Handle both array format and { messages, isDeleted } format
-          const messagesArray = res.data.messages || res.data;
-          if (Array.isArray(messagesArray) && messagesArray.length > 0) {
-            messages[chat._id] = messagesArray[messagesArray.length - 1];
-          }
-        } catch (error) {
-          console.log("Error fetching messages for", chat._id);
-        }
+      try {
+        await Promise.all(
+          chats.map(async (chat) => {
+            try {
+              const res = await axiosInstance.get(`/messages/${chat._id}`);
+              // Handle both array format and { messages, isDeleted } format
+              const messagesArray = res.data.messages || res.data;
+              if (Array.isArray(messagesArray) && messagesArray.length > 0) {
+                messages[chat._id] = messagesArray[messagesArray.length - 1];
+              }
+            } catch {
+              // Keep current behavior and fail silently per contact.
+            }
+          })
+        );
+      } finally {
+        setIsFetchingLastMessages(false);
       }
       setLastMessages(messages);
     };
 
     if (chats.length > 0) {
       fetchLastMessages();
+    } else {
+      setLastMessages({});
     }
   }, [chats]);
+
+  const onlineUserSet = useMemo(() => new Set(onlineUsers), [onlineUsers]);
 
   if (isUsersLoading) return <UsersLoadingSkeleton />;
   if (chats.length === 0) return <NoChatsFound />;
@@ -62,14 +74,14 @@ function ChatsList() {
             onClick={() => setSelectedUser(chat)}
           >
             <div className="flex items-center gap-2 md:gap-3">
-              <div className={`avatar ${onlineUsers.includes(chat._id) ? "online" : "offline"}`}>
+              <div className={`avatar ${onlineUserSet.has(chat._id) ? "online" : "offline"}`}>
                 <div className="size-10 md:size-12 rounded-full">
-                  <img src={chat.profilePic || "/avatar.png"} alt={chat.fullName} />
+                  <img src={chat.profilePic || "/avatar.png"} alt={`${chat.fullName} profile`} loading="lazy" decoding="async" />
                 </div>
               </div>
               <div className="flex-1 min-w-0">
                 <h4 className="text-slate-200 font-medium truncate text-sm md:text-base">{chat.fullName}</h4>
-                <p className={`text-xs md:text-sm truncate ${unreadCount > 0 ? "text-slate-200 font-medium" : "text-slate-400"}`}>
+                <p className={`text-xs md:text-sm truncate ${unreadCount > 0 ? "text-slate-200 font-medium" : "text-slate-400"}`} aria-live="polite">
                   {messagePreview}
                 </p>
               </div>
@@ -85,7 +97,8 @@ function ChatsList() {
           </div>
         );
       })}
+      {isFetchingLastMessages ? <span className="sr-only" aria-live="polite">Refreshing latest messages</span> : null}
     </>
   );
 }
-export default ChatsList;
+export default memo(ChatsList);

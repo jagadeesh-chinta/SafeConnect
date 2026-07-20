@@ -151,7 +151,9 @@ export const uploadMediaFile = async (req, res) => {
 export const getAllContacts = async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
-    const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } }).select("-password");
+    const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } })
+      .select("fullName profilePic email")
+      .lean();
 
     res.status(200).json(filteredUsers);
   } catch (error) {
@@ -174,7 +176,9 @@ export const searchUsers = async (req, res) => {
       _id: { $ne: loggedInUserId },
       fullName: { $regex: query.trim(), $options: "i" },
     })
-      .select("-password")
+      .select("fullName profilePic email")
+      .sort({ fullName: 1 })
+      .lean()
       .limit(20);
 
     res.status(200).json(users);
@@ -211,7 +215,7 @@ export const getMessagesByUserId = async (req, res) => {
           ],
         },
       ],
-    });
+    }).sort({ createdAt: 1 });
 
     res.status(200).json({ messages, isDeleted: false });
   } catch (error) {
@@ -345,7 +349,9 @@ export const getChatPartners = async (req, res) => {
       ),
     ];
 
-    const chatPartners = await User.find({ _id: { $in: chatPartnerIds } }).select("-password");
+    const chatPartners = await User.find({ _id: { $in: chatPartnerIds } })
+      .select("fullName profilePic email")
+      .lean();
 
     res.status(200).json(chatPartners);
   } catch (error) {
@@ -414,6 +420,8 @@ export const restoreChatHistory = async (req, res) => {
       ],
     }).sort({ createdAt: 1 }); // Sort by oldest first
 
+    const otherUser = await User.findById(otherUserId).select("fullName").lean();
+
     console.log(`Restore Chat: Successfully restored ${messages.length} messages for user pair`);
 
     res.status(200).json({
@@ -421,7 +429,7 @@ export const restoreChatHistory = async (req, res) => {
       messages,
       otherUser: {
         _id: otherUserId,
-        fullName: (await User.findById(otherUserId).select("fullName")).fullName,
+        fullName: otherUser?.fullName || "Unknown",
       },
       keyValidated: true,
     });

@@ -20,6 +20,7 @@ const friendRequestSchema = new mongoose.Schema({
 
 // prevent duplicate identical requests from same sender to same receiver
 friendRequestSchema.index({ senderId: 1, receiverId: 1 }, { unique: true });
+friendRequestSchema.index({ receiverId: 1, status: 1, createdAt: -1 });
 
 const FriendRequest = mongoose.model('FriendRequest', friendRequestSchema);
 export default FriendRequest;

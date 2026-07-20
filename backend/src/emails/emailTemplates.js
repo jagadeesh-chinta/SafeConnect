@@ -116,3 +116,93 @@ export function createWelcomeEmailTemplate(name, clientURL) {
 </html>
 `;
 }
+
+export function createOTPEmailTemplate(otp) {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chatify OTP Verification</title>
+</head>
+
+<body style="margin:0;padding:0;background-color:#f3f4f6;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3f4f6;padding:20px 0;">
+    <tr>
+      <td align="center">
+
+        <!-- Main Container -->
+        <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;font-family:Segoe UI, Arial, sans-serif;color:#333;">
+
+          <!-- Header -->
+          <tr>
+            <td align="center" style="background:linear-gradient(90deg,#3ccfdc,#5b86e5);padding:28px;">
+              <h1 style="color:#ffffff;margin:0;font-weight:600;font-size:26px;">
+                🔐 Chatify OTP
+              </h1>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding:32px;">
+
+              <p style="margin:0 0 12px 0;font-size:16px;color:#444;font-weight:600;">
+                Hi there,
+              </p>
+
+              <p style="margin:0 0 24px 0;font-size:15px;line-height:1.6;color:#555;">
+                You requested to sign in to your Chatify account. Use the one-time password (OTP) below to complete your login. This code will expire in <strong>1 minute</strong>.
+              </p>
+
+              <!-- OTP Box -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" style="padding:28px 0;">
+                    <div style="background:linear-gradient(90deg,#3ccfdc,#5b86e5);border-radius:8px;padding:20px;display:inline-block;">
+                      <p style="margin:0;font-size:36px;font-weight:700;color:#ffffff;letter-spacing:8px;font-family:monospace;">
+                        ${otp}
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Info Box -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                style="background:#f7f9fb;border-left:4px solid #fbbf24;border-radius:8px;margin-top:24px;">
+                <tr>
+                  <td style="padding:16px;">
+                    <p style="margin:0;font-size:13px;color:#666;line-height:1.6;">
+                      <strong>⚠️ Security Notice:</strong> Never share this code with anyone. Chatify staff will never ask for your OTP.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:24px 0 0 0;font-size:13px;color:#888;line-height:1.6;">
+                Didn't request this? You can safely ignore this email. Your account remains secure.
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="background:#fafafa;padding:20px;font-size:12px;color:#888;">
+              © ${new Date().getFullYear()} Chatify. All rights reserved.<br><br>
+              <a href="#" style="color:#5b86e5;text-decoration:none;margin:0 8px;">Privacy Policy</a>
+              <a href="#" style="color:#5b86e5;text-decoration:none;margin:0 8px;">Terms of Service</a>
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+`;
+}

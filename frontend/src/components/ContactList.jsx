@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useChatStore } from "../store/useChatStore";
 import UsersLoadingSkeleton from "./UsersLoadingSkeleton";
@@ -15,6 +15,7 @@ function ContactList() {
   const [contextMenu, setContextMenu] = useState(null); // { x, y, contact }
   const [undoData, setUndoData] = useState(null); // { contact, timeoutId }
   const menuRef = useRef(null);
+  const onlineUserSet = useMemo(() => new Set(onlineUsers), [onlineUsers]);
 
   const fetchFriends = async () => {
     try {
@@ -137,9 +138,9 @@ function ContactList() {
             onContextMenu={(e) => handleContextMenu(e, contact)}
           >
             <div className="flex items-center gap-2 md:gap-3">
-              <div className={`avatar ${onlineUsers.includes(contact._id) ? "online" : "offline"}`}>
+              <div className={`avatar ${onlineUserSet.has(contact._id) ? "online" : "offline"}`}>
                 <div className="size-10 md:size-12 rounded-full">
-                  <img src={contact.profilePic || "/avatar.png"} />
+                  <img src={contact.profilePic || "/avatar.png"} alt={`${contact.fullName} profile`} loading="lazy" decoding="async" />
                 </div>
               </div>
               <div className="flex-1 min-w-0">
@@ -173,10 +174,13 @@ function ContactList() {
             left: contextMenu.x,
             zIndex: 9999
           }}
+          role="menu"
+          aria-label="Contact actions"
         >
           <button
             onClick={handleDeleteChat}
             className="w-full flex items-center gap-2 px-4 py-3 text-red-400 hover:bg-white/10 transition-colors text-sm min-h-[44px]"
+            role="menuitem"
           >
             <Trash2 className="w-4 h-4" />
             Delete Chat

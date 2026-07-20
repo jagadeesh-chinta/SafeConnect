@@ -17,7 +17,7 @@ import { axiosInstance } from "../lib/axios";
 import { useAuthStore } from "../store/useAuthStore";
 import toast from "react-hot-toast";
 
-function ProfilePage() {
+function ProfilePage({ embedded = false, onBack }) {
   const navigate = useNavigate();
   const { authUser, setAuthUser } = useAuthStore();
   
@@ -194,6 +194,13 @@ function ProfilePage() {
 
   const displayImage = authUser?.profilePic || "/avatar.png";
   const pageTheme = localStorage.getItem("chatTheme") || "dark";
+  const handleBack = () => {
+    if (embedded && onBack) {
+      onBack();
+      return;
+    }
+    navigate("/");
+  };
 
   return (
     <div className={`feature-page chat-theme-${pageTheme} flex items-start justify-center p-2 md:p-4 md:py-8 overflow-y-auto`}>
@@ -202,7 +209,7 @@ function ProfilePage() {
         <div className="mb-4 md:mb-6">
           <button
             type="button"
-            onClick={() => navigate("/")}
+            onClick={handleBack}
             className="feature-back-btn cursor-pointer relative z-10 flex items-center gap-2 px-3 py-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-lg transition-all min-h-[44px]"
           >
             <ArrowLeft className="w-5 h-5" />

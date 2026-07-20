@@ -523,6 +523,14 @@ html {
   animation: chat-shell-fade 0.35s ease-out;
 }
 
+.animate-sidebar-slide-in {
+  animation: sidebar-slide-in 0.24s ease;
+}
+
+.animate-content-fade-in {
+  animation: content-fade-in 0.24s ease;
+}
+
 .chat-theme-light .text-slate-200,
 .chat-theme-light .text-slate-300 {
   color: #153244 !important;
@@ -546,6 +554,45 @@ html {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes sidebar-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes content-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 2px;
+}
+
+@media (prefers-contrast: more) {
+  .chat-glass,
+  .chat-glass-strong,
+  .feature-card {
+    border-color: rgba(255, 255, 255, 0.36);
   }
 }
 

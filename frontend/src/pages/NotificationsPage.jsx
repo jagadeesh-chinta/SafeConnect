@@ -4,7 +4,7 @@ import { ArrowLeft, Inbox } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useNotificationStore } from "../store/useNotificationStore";
 
-function NotificationsPage() {
+function NotificationsPage({ embedded = false, onBack }) {
   const navigate = useNavigate();
   const socket = useAuthStore((state) => state.socket);
   const {
@@ -16,6 +16,13 @@ function NotificationsPage() {
   } = useNotificationStore();
 
   const pageTheme = localStorage.getItem("chatTheme") || "dark";
+  const handleBack = () => {
+    if (embedded && onBack) {
+      onBack();
+      return;
+    }
+    navigate("/");
+  };
 
   useEffect(() => {
     const initializeNotifications = async () => {
@@ -48,7 +55,7 @@ function NotificationsPage() {
         <div className="mb-4 md:mb-6">
           <button
             type="button"
-            onClick={() => navigate("/")}
+            onClick={handleBack}
             className="feature-back-btn cursor-pointer relative z-10 flex items-center gap-2 px-3 py-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-lg transition-all min-h-[44px]"
           >
             <ArrowLeft className="w-5 h-5" />
