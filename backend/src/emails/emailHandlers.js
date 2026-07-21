@@ -1,19 +1,18 @@
-import { mailer, sender, assertMailerConfig } from '../lib/mailer.js';
-import {createWelcomeEmailTemplate, createOTPEmailTemplate} from './emailTemplates.js';
+import { sendMailWithGmailAPI, sender, assertMailerConfig } from '../lib/mailer.js';
+import { createWelcomeEmailTemplate, createOTPEmailTemplate } from './emailTemplates.js';
 
-export const sendWelcomeEmail = async (email , name, clientURL) => {
+export const sendWelcomeEmail = async (email, name, clientURL) => {
     assertMailerConfig();
     try {
-        const info = await mailer.sendMail({
-            from: `${sender.name} <${sender.email}>`,
+        const result = await sendMailWithGmailAPI({
             to: email,
             subject: 'Welcome to Chatify!',
-            html: createWelcomeEmailTemplate(name, clientURL)
+            html: createWelcomeEmailTemplate(name, clientURL),
         });
-        console.log("Welcome email sent successfully:", info?.messageId || info?.response || "OK");
+        console.log("Welcome email sent successfully via Gmail API:", result?.id || "OK");
     } catch (error) {
         console.error("Error sending welcome email:", error);
-        const reason = error?.message || "SMTP provider rejected the request";
+        const reason = error?.message || "Gmail API rejected the request";
         throw new Error(`Failed to send welcome email: ${reason}`);
     }
 };
@@ -21,17 +20,16 @@ export const sendWelcomeEmail = async (email , name, clientURL) => {
 export const sendOTPEmail = async (email, otp) => {
     assertMailerConfig();
     try {
-        const info = await mailer.sendMail({
-            from: `${sender.name} <${sender.email}>`,
+        const result = await sendMailWithGmailAPI({
             to: email,
             subject: 'Your Chatify OTP',
             text: `Your OTP is ${otp}. It expires in 1 minute.`,
-            html: createOTPEmailTemplate(otp)
+            html: createOTPEmailTemplate(otp),
         });
-        console.log("OTP email sent successfully:", info?.messageId || info?.response || "OK");
+        console.log("OTP email sent successfully via Gmail API:", result?.id || "OK");
     } catch (error) {
         console.error("Error sending OTP email:", error);
-        const reason = error?.message || "SMTP provider rejected the request";
+        const reason = error?.message || "Gmail API rejected the request";
         throw new Error(`Failed to send OTP email: ${reason}`);
     }
 };
