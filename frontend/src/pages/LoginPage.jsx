@@ -319,7 +319,7 @@ function LoginPage({ initialMode = "signin" }) {
       )}
 
       {/* Hero Section */}
-      <div ref={firstSectionRef} className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-[url('/src/assets/security.jpg')] bg-cover bg-center bg-no-repeat">
+      <div ref={firstSectionRef} className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-slate-950 bg-gradient-to-b from-slate-900 to-slate-950 md:bg-[url('/src/assets/security.jpg')] md:bg-cover md:bg-center bg-no-repeat">
         {/* Overlay for readability */}
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
         
@@ -384,8 +384,11 @@ function LoginPage({ initialMode = "signin" }) {
               {showOtpScreen ? (
                 <div className="w-full">
                   <div className="mb-8 text-center animate-slide-in">
-                    <div className="mx-auto size-16 bg-white/20 border border-white/20 backdrop-blur-md rounded-full flex items-center justify-center mb-6">
-                      <ShieldIcon className="size-8 text-white" />
+                    <div className="flex flex-col items-center justify-center mb-6">
+                      <div className="size-16 bg-white/20 border border-white/20 backdrop-blur-md rounded-full flex items-center justify-center mb-3">
+                        <ShieldIcon className="size-8 text-white" />
+                      </div>
+                      <span className="md:hidden font-bold tracking-widest uppercase text-xl text-white drop-shadow-md">Chatify</span>
                     </div>
                     <h2 className="text-2xl font-bold mb-2 drop-shadow-md">Verification Required</h2>
                     <p className="text-white/80 text-sm">
@@ -432,8 +435,11 @@ function LoginPage({ initialMode = "signin" }) {
               ) : (
                 <div className="w-full">
                   <div className="mb-10 text-center animate-slide-in">
-                    <div className="mx-auto size-16 bg-white/20 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center mb-6">
-                      <MessageCircleIcon className="size-8 text-white" />
+                    <div className="flex flex-col items-center justify-center mb-6">
+                      <div className="size-16 bg-white/20 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center mb-3">
+                        <MessageCircleIcon className="size-8 text-white" />
+                      </div>
+                      <span className="md:hidden font-bold tracking-widest uppercase text-xl text-white drop-shadow-md">Chatify</span>
                     </div>
                     <h2 className="text-3xl font-bold mb-2 drop-shadow-md">
                       {isSignup ? "Create Account" : "Welcome Back"}
