@@ -18,7 +18,7 @@ function FeaturesSlider() {
   const [cardWidth, setCardWidth] = useState(0);
   const [isSectionVisible, setIsSectionVisible] = useState(false);
   const isAnimatingRef = useRef(false);
-  const [visibleCards, setVisibleCards] = useState(1);
+  const [visibleCards, setVisibleCards] = useState(() => window.innerWidth < 768 ? 1 : 3);
   const GAP_PX = 32;
   const TRANSITION_MS = 550;
 
