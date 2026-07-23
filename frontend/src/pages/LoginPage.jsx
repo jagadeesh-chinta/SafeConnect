@@ -11,6 +11,8 @@ import {
   ShieldIcon,
   ArrowLeftIcon,
   PhoneIcon,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import toast from "react-hot-toast";
 import PrivacySection from "./PrivacySection";
@@ -50,13 +52,6 @@ const signupFields = [
     icon: MailIcon,
   },
   {
-    key: "phoneNumber",
-    label: "Phone Number",
-    type: "tel",
-    placeholder: "9876543210",
-    icon: PhoneIcon,
-  },
-  {
     key: "password",
     label: "Password",
     type: "password",
@@ -81,31 +76,25 @@ const countryCodeOptions = [
 const infoSlides = [
   {
     title: "Real-Time Secure Messaging",
-    description:
-      "Chat, connect, and communicate with end-to-end secure features and modern UI experience.",
+    description: "Chat, connect, and communicate with end-to-end secure features and modern UI experience.",
     subTitle: "Secure Real-Time Chat Application",
-    subDescription:
-      "Experience secure messaging with advanced features like encrypted chat, friend system, and smart communication tools.",
+    subDescription: "Experience secure messaging with advanced features like encrypted chat, friend system, and smart communication tools.",
     extraLineOne: "Instantly connect with your trusted contacts in one tap.",
     extraLineTwo: "Built with privacy-first communication at every step.",
   },
   {
     title: "Build Stronger Connections",
-    description:
-      "Manage favourites, friend requests, and private conversations with an intuitive and clean workflow.",
+    description: "Manage favourites, friend requests, and private conversations with an intuitive and clean workflow.",
     subTitle: "Smart Contact & Friend System",
-    subDescription:
-      "Keep your social graph organized with fast access to recent chats and live online presence.",
+    subDescription: "Keep your social graph organized with fast access to recent chats and live online presence.",
     extraLineOne: "Track unread updates and stay in sync in real time.",
     extraLineTwo: "Quick actions help you focus on meaningful conversations.",
   },
   {
     title: "Modern Experience, Zero Clutter",
-    description:
-      "Enjoy a responsive chat interface that adapts smoothly across desktop and mobile screens.",
+    description: "Enjoy a responsive chat interface that adapts smoothly across desktop and mobile screens.",
     subTitle: "Optimized For Everyday Use",
-    subDescription:
-      "From smooth transitions to fast message delivery, Chatify keeps communication effortless.",
+    subDescription: "From smooth transitions to fast message delivery, Chatify keeps communication effortless.",
     extraLineOne: "Designed to reduce noise and improve chat productivity.",
     extraLineTwo: "A consistent UI flow keeps your conversations uninterrupted.",
   },
@@ -114,27 +103,19 @@ const infoSlides = [
 const validateLogin = ({ email, password }) => {
   const errors = {};
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
   if (!email.trim()) errors.email = "Email is required";
   else if (!emailRegex.test(email)) errors.email = "Please enter a valid email";
-
   if (!password) errors.password = "Password is required";
-
   return errors;
 };
 
-const validateSignup = ({ fullName, email, password, phoneNumber }) => {
+const validateSignup = ({ fullName, email, password }) => {
   const errors = {};
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (!fullName.trim()) errors.fullName = "Username is required";
-  if (!email.trim()) errors.email = "Email is required";
-  else if (!emailRegex.test(email)) errors.email = "Please enter a valid email";
+  if (!fullName?.trim()) errors.fullName = "Username is required";
+  if (!email?.trim()) errors.email = "Email is required";
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = "Invalid email format";
   if (!password) errors.password = "Password is required";
   else if (password.length < 6) errors.password = "Password must be at least 6 characters";
-  if (phoneNumber && phoneNumber.trim() && !/^\d{7,15}$/.test(phoneNumber.replace(/\D/g, ""))) {
-    errors.phoneNumber = "Please enter a valid phone number";
-  }
 
   return errors;
 };
@@ -150,13 +131,14 @@ function LoginPage({ initialMode = "signin" }) {
   const navigate = useNavigate();
   const [isSignup, setIsSignup] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
-  const [formData, setFormData] = useState({ fullName: "", email: "", countryCode: "+91", phoneNumber: "", password: "" });
+  const [formData, setFormData] = useState({ fullName: "", email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [showFloatingSignup, setShowFloatingSignup] = useState(false);
   const [otp, setOtp] = useState("");
   const [resendCountdown, setResendCountdown] = useState(0);
   const [otpExpiryCountdown, setOtpExpiryCountdown] = useState(0);
   const [otpError, setOtpError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const firstSectionRef = useRef(null);
   const usernameInputRef = useRef(null);
   const otpInputRef = useRef(null);
@@ -178,19 +160,17 @@ function LoginPage({ initialMode = "signin" }) {
     }
 
     if (isSignup) {
-      const signupSuccess = await signup({
+      const signupData = {
         fullName: formData.fullName.trim(),
         email: formData.email.trim(),
-        phoneNumber: formData.phoneNumber.trim()
-          ? `${formData.countryCode}${formData.phoneNumber.replace(/\D/g, "")}`
-          : "",
         password: formData.password,
-      });
+      };
+      const signupSuccess = await signup(signupData);
 
       if (signupSuccess) {
         setIsSignup(false);
         setErrors({});
-        setFormData({ fullName: "", email: "", countryCode: "+91", phoneNumber: "", password: "" });
+        setFormData({ fullName: "", email: "", password: "" });
         navigate("/login", { replace: true });
       }
       return;
@@ -202,12 +182,10 @@ function LoginPage({ initialMode = "signin" }) {
   const handleOtpSubmit = (e) => {
     e.preventDefault();
     const otpValidationError = validateOTP(otp);
-    
     if (otpValidationError) {
       setOtpError(otpValidationError);
       return;
     }
-
     verifyOTP(otpEmail, otp);
   };
 
@@ -219,7 +197,6 @@ function LoginPage({ initialMode = "signin" }) {
 
   const handleResendOtp = async () => {
     if (resendCountdown > 0) return;
-    
     await resendOTP(otpEmail);
     setResendCountdown(30);
   };
@@ -230,7 +207,7 @@ function LoginPage({ initialMode = "signin" }) {
     setResendCountdown(0);
     setOtpExpiryCountdown(0);
     useAuthStore.setState({ otpEmail: null, otpExpiresAt: null });
-    setFormData({ fullName: "", email: "", countryCode: "+91", phoneNumber: "", password: "" });
+    setFormData({ fullName: "", email: "", password: "" });
   };
 
   const formatCountdown = (seconds) => {
@@ -249,34 +226,29 @@ function LoginPage({ initialMode = "signin" }) {
   const handleSwitchMode = () => {
     setIsSignup((prev) => !prev);
     setErrors({});
-    setFormData({ fullName: "", email: "", countryCode: "+91", phoneNumber: "", password: "" });
+    setFormData({ fullName: "", email: "", password: "" });
   };
 
-  // Resend countdown timer
   useEffect(() => {
     if (resendCountdown <= 0) return;
     const timer = setTimeout(() => setResendCountdown(resendCountdown - 1), 1000);
     return () => clearTimeout(timer);
   }, [resendCountdown]);
 
-  // OTP expiry countdown timer
   useEffect(() => {
     if (!showOtpScreen || !otpExpiresAt) {
       setOtpExpiryCountdown(0);
       return;
     }
-
     const updateCountdown = () => {
       const remaining = Math.max(0, Math.ceil((new Date(otpExpiresAt).getTime() - Date.now()) / 1000));
       setOtpExpiryCountdown(remaining);
     };
-
     updateCountdown();
     const interval = setInterval(updateCountdown, 1000);
     return () => clearInterval(interval);
   }, [showOtpScreen, otpExpiresAt]);
 
-  // Focus OTP input when screen appears
   useEffect(() => {
     if (showOtpScreen && otpInputRef.current) {
       setTimeout(() => otpInputRef.current?.focus(), 300);
@@ -292,20 +264,17 @@ function LoginPage({ initialMode = "signin" }) {
     const intervalId = setInterval(() => {
       setActiveSlide((prev) => (prev + 1) % infoSlides.length);
     }, 5000);
-
     return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
     if (!firstSectionRef.current) return;
-
     const observer = new IntersectionObserver(
       ([entry]) => {
         setShowFloatingSignup(!entry.isIntersecting);
       },
       { threshold: 0.15 }
     );
-
     observer.observe(firstSectionRef.current);
     return () => observer.disconnect();
   }, []);
@@ -314,10 +283,8 @@ function LoginPage({ initialMode = "signin" }) {
     navigate("/signup");
     setIsSignup(true);
     setErrors({});
-    setFormData({ fullName: "", email: "", countryCode: "+91", phoneNumber: "", password: "" });
-
+    setFormData({ fullName: "", email: "", password: "" });
     firstSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-
     setTimeout(() => {
       usernameInputRef.current?.focus();
     }, 450);
@@ -328,12 +295,13 @@ function LoginPage({ initialMode = "signin" }) {
   };
 
   return (
-    <div className="auth-screen-wrapper w-full">
+    <div className="w-full min-h-screen bg-bg-primary text-text-primary overflow-x-hidden">
+      {/* Floating Buttons */}
       {showFloatingSignup && (
         <button
           type="button"
           onClick={handleFloatingSignupClick}
-          className="fixed right-5 top-5 z-50 rounded-xl border border-cyan-300/40 bg-slate-900/70 px-5 py-2.5 text-sm font-semibold tracking-wide text-cyan-200 backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-slate-800/80 hover:text-white"
+          className="fixed right-5 top-5 z-50 glass-card px-5 py-2.5 text-sm font-semibold tracking-wide text-accent-primary transition hover:-translate-y-0.5 rounded-xl"
         >
           Sign Up
         </button>
@@ -343,81 +311,96 @@ function LoginPage({ initialMode = "signin" }) {
         <button
           type="button"
           onClick={handleScrollToFirstSection}
-          className="fixed bottom-6 right-6 z-50 inline-flex h-12 w-12 items-center justify-center rounded-full border border-cyan-300/45 bg-slate-900/75 text-cyan-200 shadow-[0_10px_28px_rgba(6,182,212,0.25)] backdrop-blur-md transition hover:-translate-y-1 hover:bg-slate-800/85 hover:text-white"
+          className="fixed bottom-6 right-6 z-50 glass-card inline-flex h-12 w-12 items-center justify-center rounded-full text-accent-primary transition hover:-translate-y-1"
           aria-label="Back to top"
         >
           <ChevronUpIcon className="h-6 w-6" />
         </button>
       )}
 
-      {/* Login Section - Full Viewport Height */}
-      <div ref={firstSectionRef} className="auth-screen h-screen w-full flex items-center justify-center">
-        <div className="auth-shell h-full w-full overflow-hidden">
-          <div className="flex h-full w-full flex-col md:flex-row">
-          <aside className="auth-info-panel hidden h-full md:flex md:w-3/5">
-            <div className="relative z-10 mx-auto flex h-full w-full max-w-3xl flex-col justify-between px-10 py-16 xl:px-16">
-              <div>
-                <p className="text-sm tracking-[0.2em] uppercase text-cyan-200/80">Chatify</p>
-                <h1 className="mt-4 text-4xl font-semibold leading-tight text-white xl:text-5xl">
-                  {selectedSlide.title}
-                </h1>
-                <p className="mt-5 text-base leading-relaxed text-cyan-50/90">
-                  {selectedSlide.description}
-                </p>
-              </div>
+      {/* Hero Section */}
+      <div ref={firstSectionRef} className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-[url('/src/assets/security.jpg')] bg-cover bg-center bg-no-repeat">
+        {/* Overlay for readability */}
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
+        
+        {/* Animated Background Gradients (subtle) */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-50">
+          <div className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-accent-primary/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3" />
+          <div className="absolute bottom-0 left-0 w-[50vw] h-[50vw] bg-accent-secondary/20 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/3" />
+        </div>
 
-              <div>
-                <h2 className="text-xl font-medium text-cyan-100">{selectedSlide.subTitle}</h2>
-                <p className="mt-3 max-w-md text-sm text-cyan-100/85">
-                  {selectedSlide.subDescription}
-                </p>
-                <p className="mt-2 max-w-md text-sm text-cyan-100/90">{selectedSlide.extraLineOne}</p>
-                <p className="mt-1 max-w-md text-sm text-cyan-100/90">{selectedSlide.extraLineTwo}</p>
-
-                <button type="button" className="auth-ghost-btn mt-7">
-                  Explore Chat
-                </button>
-
-                <div className="mt-8 flex items-center gap-2">
-                  {infoSlides.map((_, index) => (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => setActiveSlide(index)}
-                      className={`auth-dot cursor-pointer ${activeSlide === index ? "auth-dot-active" : ""}`}
-                      aria-label={`Show info slide ${index + 1}`}
-                    />
-                  ))}
+        <div className="relative z-10 w-full h-full flex flex-col md:flex-row">
+          {/* Left Info Panel */}
+          <aside className="hidden h-full md:flex md:w-1/2 lg:w-3/5 p-8 lg:p-16 flex-col justify-between text-white">
+            <div className="animate-fade-in drop-shadow-md">
+              <div className="flex items-center gap-3 text-white mb-8">
+                <div className="size-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20">
+                  <MessageCircleIcon className="size-6" />
                 </div>
+                <span className="font-bold tracking-widest uppercase text-sm">Chatify</span>
+              </div>
+              <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight mb-6">
+                {selectedSlide.title}
+              </h1>
+              <p className="text-lg text-white/80 max-w-xl">
+                {selectedSlide.description}
+              </p>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 max-w-xl animate-fade-in-up text-white shadow-2xl">
+              <h2 className="text-xl font-semibold mb-3">{selectedSlide.subTitle}</h2>
+              <p className="text-white/80 mb-6 leading-relaxed">
+                {selectedSlide.subDescription}
+              </p>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-center gap-3 text-sm text-text-muted">
+                  <div className="size-1.5 rounded-full bg-accent-primary" />
+                  {selectedSlide.extraLineOne}
+                </li>
+                <li className="flex items-center gap-3 text-sm text-text-muted">
+                  <div className="size-1.5 rounded-full bg-accent-primary" />
+                  {selectedSlide.extraLineTwo}
+                </li>
+              </ul>
+
+              <div className="flex items-center gap-3">
+                {infoSlides.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setActiveSlide(index)}
+                    className={`h-2 rounded-full transition-all duration-300 ${activeSlide === index ? 'w-8 bg-accent-primary' : 'w-2 bg-text-muted/30'}`}
+                    aria-label={`Slide ${index + 1}`}
+                  />
+                ))}
               </div>
             </div>
           </aside>
 
-          <section className="auth-form-side h-full w-full px-4 py-8 sm:px-8 sm:py-10 md:w-2/5 md:px-10 md:py-12 lg:px-12 lg:py-14">
-            <div className="auth-form-card mx-auto w-full max-w-xl rounded-2xl p-7 shadow-2xl sm:p-8">
+          {/* Right Form Panel */}
+          <section className="h-full w-full md:w-1/2 lg:w-2/5 p-6 sm:p-8 flex items-center justify-center">
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 w-full max-w-md rounded-2xl p-8 animate-scale-in relative overflow-hidden shadow-2xl text-white">
               
-              {/* OTP Screen */}
-              {showOtpScreen && (
+              {/* Form Content */}
+              {showOtpScreen ? (
                 <div className="w-full">
-                  <div className="auth-form-transition mx-auto w-full max-w-md space-y-6">
-                  <div className="mb-8 text-center">
-                    <MessageCircleIcon className="mx-auto mb-3 size-10 text-sky-600" />
-                    <h2 className="text-3xl font-semibold text-slate-900">Enter OTP</h2>
-                    <p className="mt-2 text-sm text-slate-500">
-                      Enter the 6-digit code sent to <span className="font-medium text-sky-600">{otpEmail}</span>
+                  <div className="mb-8 text-center animate-slide-in">
+                    <div className="mx-auto size-16 bg-white/20 border border-white/20 backdrop-blur-md rounded-full flex items-center justify-center mb-6">
+                      <ShieldIcon className="size-8 text-white" />
+                    </div>
+                    <h2 className="text-2xl font-bold mb-2 drop-shadow-md">Verification Required</h2>
+                    <p className="text-white/80 text-sm">
+                      Enter the 6-digit code sent to<br/>
+                      <span className="font-semibold text-white">{otpEmail}</span>
                     </p>
-                    <p className={`mt-2 text-sm font-medium ${otpExpiryCountdown > 0 ? "text-amber-600" : "text-red-600"}`}>
-                      {otpExpiryCountdown > 0
-                        ? `OTP expires in ${formatCountdown(otpExpiryCountdown)}`
-                        : "OTP expired. Please resend OTP."}
+                    <p className={`mt-3 text-sm font-medium ${otpExpiryCountdown > 0 ? "text-yellow-300" : "text-red-300"}`}>
+                      {otpExpiryCountdown > 0 ? `Code expires in ${formatCountdown(otpExpiryCountdown)}` : "Code expired. Please resend."}
                     </p>
                   </div>
 
-                  <form onSubmit={handleOtpSubmit} className="auth-form-transition space-y-5" key="verify-otp">
+                  <form onSubmit={handleOtpSubmit} className="space-y-6 animate-fade-in-up">
                     <div>
-                      <label className="auth-light-label">One-Time Password</label>
                       <div className="relative">
-                        <ShieldIcon className="auth-light-icon" />
+                        <ShieldIcon className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-white/60" />
                         <input
                           ref={otpInputRef}
                           type="text"
@@ -425,173 +408,132 @@ function LoginPage({ initialMode = "signin" }) {
                           value={otp}
                           onChange={handleOtpChange}
                           maxLength="6"
-                          placeholder="Enter 6-digit OTP"
-                          className={`auth-light-input ${otpError ? "auth-light-input-error" : ""}`}
+                          placeholder="000000"
+                          className={`w-full bg-white/10 border border-white/20 text-white placeholder:text-white/50 rounded-xl py-3.5 pl-12 pr-4 text-center text-2xl tracking-[0.5em] font-medium focus:border-white focus:bg-white/20 outline-none transition-all ${otpError ? "!border-danger focus:!ring-danger/50" : ""}`}
                         />
                       </div>
-                      {otpError && <p className="auth-error-text mt-1">{otpError}</p>}
+                      {otpError && <p className="text-red-300 text-sm mt-2 text-center">{otpError}</p>}
                     </div>
 
-                    <button className="auth-gradient-btn" type="submit" disabled={isVerifyingOTP || otp.length !== 6}>
-                      {isVerifyingOTP ? (
-                        <LoaderIcon className="mx-auto size-5 animate-spin" />
-                      ) : (
-                        "VERIFY OTP"
-                      )}
+                    <button className="bg-white/20 hover:bg-white/30 border border-white/30 text-white shadow-lg backdrop-blur-md w-full rounded-xl py-3.5 font-semibold tracking-wide flex items-center justify-center gap-2 transition-all duration-300 hover:-translate-y-0.5" type="submit" disabled={isVerifyingOTP || otp.length !== 6}>
+                      {isVerifyingOTP ? <LoaderIcon className="size-5 animate-spin" /> : "Verify Code"}
                     </button>
                   </form>
 
-                  <div className="flex items-center justify-between text-sm">
-                    <button
-                      type="button"
-                      onClick={handleBackToLogin}
-                      className="inline-flex items-center gap-2 text-slate-600 transition hover:text-sky-700"
-                    >
-                      <ArrowLeftIcon className="h-4 w-4" />
-                      Back to Login
+                  <div className="mt-8 flex items-center justify-between text-sm">
+                    <button onClick={handleBackToLogin} className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
+                      <ArrowLeftIcon className="size-4" /> Back
                     </button>
-                    <button
-                      type="button"
-                      onClick={handleResendOtp}
-                      disabled={resendCountdown > 0}
-                      className={`font-medium transition ${
-                        resendCountdown > 0
-                          ? "text-slate-400 cursor-not-allowed"
-                          : "text-sky-600 hover:text-sky-700"
-                      }`}
-                    >
-                      {resendCountdown > 0 ? `Resend in ${resendCountdown}s` : "Resend OTP"}
+                    <button onClick={handleResendOtp} disabled={resendCountdown > 0} className={`font-medium transition-colors ${resendCountdown > 0 ? "text-white/40 cursor-not-allowed" : "text-white hover:underline underline-offset-2"}`}>
+                      {resendCountdown > 0 ? `Resend in ${resendCountdown}s` : "Resend Code"}
                     </button>
-                  </div>
                   </div>
                 </div>
-              )}
-
-              {/* Login/Signup Screen */}
-              {!showOtpScreen && (
-                <>
-                  <div className="mb-8 text-center">
-                    <MessageCircleIcon className="mx-auto mb-3 size-10 text-sky-600" />
-                    <h2 className="text-3xl font-semibold text-slate-900">
-                      {isSignup ? "Create Your Chatify Account" : "Welcome to Chatify"}
+              ) : (
+                <div className="w-full">
+                  <div className="mb-10 text-center animate-slide-in">
+                    <div className="mx-auto size-16 bg-white/20 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center mb-6">
+                      <MessageCircleIcon className="size-8 text-white" />
+                    </div>
+                    <h2 className="text-3xl font-bold mb-2 drop-shadow-md">
+                      {isSignup ? "Create Account" : "Welcome Back"}
                     </h2>
-                    <p className="mt-2 text-sm text-slate-500">
-                      {isSignup
-                        ? "Sign up to start secure conversations."
-                        : "Sign in to continue your secure conversations."}
+                    <p className="text-white/80 text-sm">
+                      {isSignup ? "Sign up to start secure conversations" : "Sign in to continue your secure conversations"}
                     </p>
                   </div>
 
-                  <form onSubmit={handleSubmit} className="auth-form-transition space-y-5" key={isSignup ? "signup" : "signin"}>
+                  <form onSubmit={handleSubmit} className="space-y-5 animate-fade-in-up" key={isSignup ? "signup" : "signin"}>
                     {activeFields.map((field) => {
                       const Icon = field.icon;
 
-                      if (isSignup && field.key === "phoneNumber") {
-                        return (
-                          <div key={field.key}>
-                            <label className="auth-light-label">{field.label}</label>
-                            <div className="flex gap-2">
-                              <select
-                                value={formData.countryCode}
-                                onChange={(e) => handleFieldChange("countryCode", e.target.value)}
-                                className="w-44 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700 focus:border-sky-400 focus:outline-none"
-                              >
-                                {countryCodeOptions.map((item) => (
-                                  <option key={item.code} value={item.code}>
-                                    {item.label}
-                                  </option>
-                                ))}
-                              </select>
-
-                              <div className="relative flex-1">
-                                <Icon className="auth-light-icon" />
-                                <input
-                                  type="tel"
-                                  value={formData.phoneNumber}
-                                  onChange={(e) => handleFieldChange("phoneNumber", e.target.value.replace(/[^\d]/g, ""))}
-                                  className={`auth-light-input ${errors.phoneNumber ? "auth-light-input-error" : ""}`}
-                                  placeholder={field.placeholder}
-                                />
-                              </div>
-                            </div>
-                            {errors.phoneNumber && <p className="auth-error-text mt-1">{errors.phoneNumber}</p>}
-                          </div>
-                        );
-                      }
-
                       return (
                         <div key={field.key}>
-                          <label className="auth-light-label">{field.label}</label>
-                          <div className="relative">
-                            <Icon className="auth-light-icon" />
+                          <label className="block text-sm font-medium text-white/90 mb-2">{field.label}</label>
+                          <div className="relative group">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                              <Icon className={`h-5 w-5 transition-colors ${errors[field.key] ? 'text-danger' : 'text-white/50 group-focus-within:text-white'}`} />
+                            </div>
                             <input
-                              type={field.type}
+                              type={field.key === "password" ? (showPassword ? "text" : "password") : field.type}
                               ref={field.key === "fullName" ? usernameInputRef : null}
                               value={formData[field.key]}
                               onChange={(e) => handleFieldChange(field.key, e.target.value)}
-                              className={`auth-light-input ${errors[field.key] ? "auth-light-input-error" : ""}`}
+                              className={`w-full bg-white/10 border border-white/20 text-white placeholder:text-white/50 rounded-xl py-3 pl-12 pr-4 focus:border-white focus:bg-white/20 outline-none transition-all ${errors[field.key] ? "!border-danger focus:!ring-danger/50" : ""}`}
                               placeholder={field.placeholder}
                             />
+                            {field.key === "password" && (
+                              <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute inset-y-0 right-0 pr-4 flex items-center text-white/50 hover:text-white transition-colors"
+                              >
+                                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                              </button>
+                            )}
                           </div>
-                          {errors[field.key] && <p className="auth-error-text mt-1">{errors[field.key]}</p>}
+                          {errors[field.key] && (
+                            <p className="text-red-300 text-xs mt-1.5 ml-1 animate-fadeIn flex items-center gap-1">
+                              <span className="w-1 h-1 rounded-full bg-red-400 inline-block"></span>
+                              {errors[field.key]}
+                            </p>
+                          )}
                         </div>
                       );
                     })}
 
-                    <div className="flex items-center justify-between text-sm">
-                      <label className="inline-flex items-center gap-2 text-slate-600">
-                        <input type="checkbox" className="size-4 rounded border-slate-300" />
-                        <span>Keep me logged in</span>
+                    <div className="flex items-center justify-between text-sm mt-2">
+                      <label className="flex items-center gap-2 cursor-pointer group">
+                        <div className="relative flex items-center justify-center">
+                          <input type="checkbox" className="peer sr-only" />
+                          <div className="size-4 rounded border border-white/30 bg-white/10 peer-checked:bg-white peer-checked:border-white transition-all flex items-center justify-center">
+                            <svg className="w-3 h-3 text-accent-primary opacity-0 peer-checked:opacity-100 transition-opacity" viewBox="0 0 14 14" fill="none">
+                              <path d="M3 8L6 11L11 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </div>
+                        </div>
+                        <span className="text-white/80 group-hover:text-white transition-colors">Remember me</span>
                       </label>
                       {!isSignup && (
-                        <button
-                          type="button"
-                          className="cursor-pointer text-sky-600 transition hover:text-emerald-600"
-                        >
-                          Forgot Password
+                        <button type="button" className="text-white/90 hover:text-white font-medium transition-colors underline decoration-white/30 underline-offset-2">
+                          Forgot password?
                         </button>
                       )}
                     </div>
 
-                    <button className="auth-gradient-btn" type="submit" disabled={isSubmitting}>
+                    <button className="bg-white/20 hover:bg-white/30 border border-white/30 text-white shadow-lg backdrop-blur-md w-full rounded-xl py-3.5 font-semibold tracking-wide flex items-center justify-center gap-2 mt-6 transition-all duration-300 hover:-translate-y-0.5" type="submit" disabled={isSubmitting}>
                       {isSubmitting ? (
-                        <LoaderIcon className="mx-auto size-5 animate-spin" />
+                        <LoaderIcon className="size-5 animate-spin" />
                       ) : isSignup ? (
-                        "SIGN UP"
+                        "Create Account"
                       ) : (
-                        "SIGN IN"
+                        "Sign In"
                       )}
                     </button>
                   </form>
 
-                  <div className="mt-6 text-center text-sm text-slate-600">
+                  <div className="mt-8 text-center text-sm text-white/80">
                     {isSignup ? "Already have an account? " : "Don't have an account? "}
                     <button
                       type="button"
                       onClick={handleSwitchMode}
-                      className="signLink ml-1 bg-transparent font-medium"
+                      className="text-white font-bold transition-colors ml-1 hover:underline underline-offset-2"
                     >
-                      {isSignup ? "Sign In" : "Sign Up"}
+                      {isSignup ? "Sign in" : "Sign up"}
                     </button>
                   </div>
-                </>
+                </div>
               )}
             </div>
           </section>
         </div>
       </div>
-      </div>
 
-      {/* Privacy Section */}
       <PrivacySection />
-
-      {/* Features Slider Section */}
       <FeaturesSlider />
-
-      {/* Security Showcase Section */}
       <SecurityShowcaseSection />
-
     </div>
   );
 }
+
 export default LoginPage;

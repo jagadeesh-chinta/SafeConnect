@@ -1,4 +1,5 @@
 import { memo, useEffect, useMemo, useState } from "react";
+import { Search, X } from "lucide-react";
 import { useChatStore } from "../store/useChatStore";
 import UsersLoadingSkeleton from "./UsersLoadingSkeleton";
 import NoChatsFound from "./NoChatsFound";
@@ -10,12 +11,13 @@ function ChatsList() {
   const { onlineUsers } = useAuthStore();
   const [lastMessages, setLastMessages] = useState({});
   const [isFetchingLastMessages, setIsFetchingLastMessages] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
     getFavourites();
   }, [getFavourites]);
 
-  // Fetch last message for each favourite
   useEffect(() => {
     const fetchLastMessages = async () => {
       setIsFetchingLastMessages(true);
@@ -25,7 +27,6 @@ function ChatsList() {
           chats.map(async (chat) => {
             try {
               const res = await axiosInstance.get(`/messages/${chat._id}`);
-              // Handle both array format and { messages, isDeleted } format
               const messagesArray = res.data.messages || res.data;
               if (Array.isArray(messagesArray) && messagesArray.length > 0) {
                 messages[chat._id] = messagesArray[messagesArray.length - 1];
@@ -49,56 +50,115 @@ function ChatsList() {
   }, [chats]);
 
   const onlineUserSet = useMemo(() => new Set(onlineUsers), [onlineUsers]);
+  
+  const filteredChats = useMemo(() => {
+    if (!searchQuery.trim()) return chats;
+    return chats.filter(chat => chat.fullName.toLowerCase().includes(searchQuery.toLowerCase()));
+  }, [chats, searchQuery]);
 
   if (isUsersLoading) return <UsersLoadingSkeleton />;
   if (chats.length === 0) return <NoChatsFound />;
 
   return (
-    <>
-      {chats.map((chat) => {
-        const lastMessage = lastMessages[chat._id];
+    <div className="flex flex-col h-full">
+      {/* Search Bar Container */}
+      <div className="px-2 pb-2 sticky top-0 bg-bg-elevated/80 backdrop-blur-md z-10">
+        {!isSearchOpen ? (
+          <div className="flex justify-end md:hidden">
+            <button 
+              onClick={() => setIsSearchOpen(true)}
+              className="p-2 rounded-full glass-button text-text-secondary hover:text-accent-primary transition-colors"
+              aria-label="Open search"
+            >
+              <Search className="size-5" />
+            </button>
+          </div>
+        ) : null}
+
+        <div className={`relative ${!isSearchOpen ? 'hidden md:block' : 'block'}`}>
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-text-muted" />
+          <input
+            type="text"
+            placeholder="Search chats..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-10 py-2.5 bg-bg-secondary border border-border rounded-xl text-sm focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary transition-all text-text-primary placeholder:text-text-muted"
+          />
+          {searchQuery ? (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
+            >
+              <X className="size-4" />
+            </button>
+          ) : isSearchOpen ? (
+            <button
+              onClick={() => setIsSearchOpen(false)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary md:hidden"
+            >
+              <X className="size-4" />
+            </button>
+          ) : null}
+        </div>
+      </div>
+
+      {filteredChats.length === 0 && searchQuery ? (
+        <div className="text-center py-8 text-text-secondary text-sm">
+          No chats found matching "{searchQuery}"
+        </div>
+      ) : null}
+
+      <div className="flex-1 overflow-y-auto custom-scrollbar pr-1">
+        {filteredChats.map((chat) => {
+          const lastMessage = lastMessages[chat._id];
         const unreadData = unreadCounts[chat._id];
         const unreadCount = unreadData?.count || 0;
         
-        // Use unread data's last message if available (more recent)
         const messagePreview = unreadData?.lastMessage 
           ? unreadData.lastMessage 
           : lastMessage
             ? lastMessage.text || "(Image)"
             : "No messages yet";
 
+        const isActive = selectedUser?._id === chat._id;
+
         return (
           <div
             key={chat._id}
-            className={`chat-list-item p-3 md:p-4 rounded-xl cursor-pointer min-h-[60px] ${selectedUser?._id === chat._id ? "chat-list-item-active" : ""}`}
+            className={`chat-list-item p-3 rounded-xl cursor-pointer min-h-[68px] flex items-center gap-3 transition-all duration-200 ${isActive ? "active" : ""}`}
             onClick={() => setSelectedUser(chat)}
           >
-            <div className="flex items-center gap-2 md:gap-3">
-              <div className={`avatar ${onlineUserSet.has(chat._id) ? "online" : "offline"}`}>
-                <div className="size-10 md:size-12 rounded-full">
-                  <img src={chat.profilePic || "/avatar.png"} alt={`${chat.fullName} profile`} loading="lazy" decoding="async" />
-                </div>
+            <div className="relative">
+              <div className="size-12 rounded-full overflow-hidden ring-2 ring-transparent">
+                <img src={chat.profilePic || "/avatar.png"} alt={`${chat.fullName} profile`} loading="lazy" decoding="async" className="w-full h-full object-cover" />
               </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-slate-200 font-medium truncate text-sm md:text-base">{chat.fullName}</h4>
-                <p className={`text-xs md:text-sm truncate ${unreadCount > 0 ? "text-slate-200 font-medium" : "text-slate-400"}`} aria-live="polite">
-                  {messagePreview}
-                </p>
-              </div>
-              {/* Unread count badge */}
-              {unreadCount > 0 && (
-                <div className="chat-unread-badge flex-shrink-0 min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">
-                    {unreadCount > 99 ? "99+" : unreadCount}
-                  </span>
-                </div>
+              {onlineUserSet.has(chat._id) && (
+                <div className="absolute bottom-0 right-0 online-dot" />
               )}
             </div>
+            
+            <div className="flex-1 min-w-0 flex flex-col justify-center">
+              <h4 className={`font-semibold truncate text-sm md:text-base ${isActive ? "text-accent-primary" : "text-text-primary"}`}>
+                {chat.fullName}
+              </h4>
+              <p className={`text-xs md:text-sm truncate mt-0.5 ${unreadCount > 0 ? "text-text-primary font-medium" : "text-text-muted"}`} aria-live="polite">
+                {messagePreview}
+              </p>
+            </div>
+            
+            {unreadCount > 0 && (
+              <div className="flex-shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-accent-primary flex items-center justify-center shadow-sm">
+                <span className="text-white text-[10px] font-bold">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              </div>
+            )}
           </div>
         );
       })}
+      </div>
       {isFetchingLastMessages ? <span className="sr-only" aria-live="polite">Refreshing latest messages</span> : null}
-    </>
+    </div>
   );
 }
 export default memo(ChatsList);

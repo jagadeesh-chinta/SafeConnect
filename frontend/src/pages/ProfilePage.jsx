@@ -11,7 +11,8 @@ import {
   X, 
   Eye, 
   EyeOff,
-  Key
+  Key,
+  Phone
 } from "lucide-react";
 import { axiosInstance } from "../lib/axios";
 import { useAuthStore } from "../store/useAuthStore";
@@ -19,7 +20,7 @@ import toast from "react-hot-toast";
 
 function ProfilePage({ embedded = false, onBack }) {
   const navigate = useNavigate();
-  const { authUser, setAuthUser } = useAuthStore();
+  const { authUser, setAuthUser, updatePhone } = useAuthStore();
   
   // Profile image state
   const [isDeletingImage, setIsDeletingImage] = useState(false);
@@ -28,6 +29,11 @@ function ProfilePage({ embedded = false, onBack }) {
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [newUsername, setNewUsername] = useState(authUser?.fullName || "");
   const [isUpdatingUsername, setIsUpdatingUsername] = useState(false);
+
+  // Phone number editing state
+  const [isEditingPhone, setIsEditingPhone] = useState(false);
+  const [newPhone, setNewPhone] = useState(authUser?.phoneNumber || "");
+  const [isUpdatingPhone, setIsUpdatingPhone] = useState(false);
 
   // Password change state
   const [showPasswordForm, setShowPasswordForm] = useState(false);
@@ -108,6 +114,41 @@ function ProfilePage({ embedded = false, onBack }) {
   const handleCancelUsernameEdit = () => {
     setNewUsername(authUser?.fullName || "");
     setIsEditingUsername(false);
+  };
+
+  // Handle phone update
+  const handleUpdatePhone = async () => {
+    if (!newPhone.trim()) {
+      toast.error("Phone number cannot be empty");
+      return;
+    }
+
+    const trimmedPhone = newPhone.replace(/\D/g, "");
+    if (!/^\d{7,15}$/.test(trimmedPhone)) {
+      toast.error("Please enter a valid phone number (7-15 digits)");
+      return;
+    }
+
+    if (trimmedPhone === authUser.phoneNumber) {
+      setIsEditingPhone(false);
+      return;
+    }
+
+    setIsUpdatingPhone(true);
+    try {
+      const success = await updatePhone(trimmedPhone);
+      if (success) {
+        setIsEditingPhone(false);
+      }
+    } finally {
+      setIsUpdatingPhone(false);
+    }
+  };
+
+  // Cancel phone editing
+  const handleCancelPhoneEdit = () => {
+    setNewPhone(authUser?.phoneNumber || "");
+    setIsEditingPhone(false);
   };
 
   // Handle password change
@@ -222,8 +263,8 @@ function ProfilePage({ embedded = false, onBack }) {
           {/* Profile Icon Header */}
           <div className="text-center mb-6 md:mb-8">
             <div className="flex justify-center mb-4">
-              <div className="bg-gradient-to-br from-cyan-500/20 to-blue-500/20 p-3 rounded-full">
-                <User className="w-8 h-8 text-cyan-400" />
+              <div className="bg-accent-primary/10 p-4 rounded-full ring-4 ring-accent-primary/5">
+                <User className="w-8 h-8 text-accent-primary" />
               </div>
             </div>
             <h1 className="text-xl md:text-2xl font-bold text-slate-100 mb-1">Profile Settings</h1>
@@ -237,7 +278,7 @@ function ProfilePage({ embedded = false, onBack }) {
               <div className="relative mb-4">
                 <button
                   onClick={() => authUser?.profilePic && navigate("/profile/view-image")}
-                  className={`w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-slate-700 ${authUser?.profilePic ? "cursor-pointer hover:border-cyan-500 transition-colors" : "cursor-default"}`}
+                  className={`w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-border shadow-lg ${authUser?.profilePic ? "cursor-pointer hover:border-accent-primary transition-colors" : "cursor-default"}`}
                   disabled={!authUser?.profilePic}
                 >
                   <img
@@ -247,15 +288,15 @@ function ProfilePage({ embedded = false, onBack }) {
                   />
                 </button>
                 {authUser?.profilePic && (
-                  <p className="text-slate-500 text-xs mt-1 text-center">Click to view</p>
+                  <p className="text-text-muted text-xs mt-2 text-center font-medium">Click to view</p>
                 )}
               </div>
 
               {/* Image Action Buttons */}
-              <div className="flex flex-wrap justify-center gap-2">
+              <div className="flex flex-wrap justify-center gap-3 mt-2">
                 <button
                   onClick={() => navigate("/profile/crop")}
-                  className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors text-sm min-h-[44px]"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-bg-elevated hover:bg-bg-secondary text-text-primary border border-border rounded-xl transition-all font-semibold shadow-sm min-h-[44px]"
                 >
                   <Camera className="w-4 h-4" />
                   {authUser?.profilePic ? "Change Icon" : "Add Icon"}
@@ -264,7 +305,7 @@ function ProfilePage({ embedded = false, onBack }) {
                   <button
                     onClick={handleDeleteImage}
                     disabled={isDeletingImage}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg transition-colors text-sm"
+                    className="flex items-center gap-2 px-4 py-2.5 bg-danger/10 hover:bg-danger/20 text-danger border border-danger/20 rounded-xl transition-all font-semibold shadow-sm"
                   >
                     {isDeletingImage ? (
                       <div className="w-4 h-4 border-2 border-red-400/20 border-t-red-400 rounded-full animate-spin" />
@@ -279,7 +320,7 @@ function ProfilePage({ embedded = false, onBack }) {
           </div>
 
           {/* Divider */}
-          <div className="border-t border-slate-700/50 my-6"></div>
+          <div className="border-t border-border my-8"></div>
 
           {/* Username Section */}
           <div className="mb-6">
@@ -290,7 +331,7 @@ function ProfilePage({ embedded = false, onBack }) {
                   type="text"
                   value={newUsername}
                   onChange={(e) => setNewUsername(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-cyan-500 transition-colors"
+                  className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:ring-1 focus:ring-accent-primary transition-all shadow-inner"
                   placeholder="Enter new username"
                   autoFocus
                 />
@@ -298,7 +339,7 @@ function ProfilePage({ embedded = false, onBack }) {
                   <button
                     onClick={handleUpdateUsername}
                     disabled={isUpdatingUsername}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:bg-cyan-600/50 text-white rounded-lg transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 primary-button disabled:opacity-50 font-bold rounded-xl transition-all shadow-md shadow-accent-primary/20"
                   >
                     {isUpdatingUsername ? (
                       <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -310,7 +351,7 @@ function ProfilePage({ embedded = false, onBack }) {
                   <button
                     onClick={handleCancelUsernameEdit}
                     disabled={isUpdatingUsername}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-bg-elevated hover:bg-bg-secondary text-text-primary border border-border rounded-xl transition-all font-semibold"
                   >
                     <X className="w-4 h-4" />
                     Cancel
@@ -318,11 +359,61 @@ function ProfilePage({ embedded = false, onBack }) {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-between p-4 bg-slate-900/30 border border-slate-700/50 rounded-lg">
-                <span className="text-slate-200 font-medium">{authUser?.fullName}</span>
+              <div className="flex items-center justify-between p-4 bg-bg-secondary/50 border border-border shadow-inner rounded-xl">
+                <span className="text-text-primary font-medium">{authUser?.fullName}</span>
                 <button
                   onClick={() => setIsEditingUsername(true)}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors text-sm"
+                  className="flex items-center gap-2 px-4 py-2 bg-bg-elevated hover:bg-bg-secondary text-text-primary border border-border rounded-lg transition-all text-sm font-semibold"
+                >
+                  <Edit3 className="w-4 h-4" />
+                  Edit
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Phone Number Section */}
+          <div className="mb-6">
+            <label className="block text-slate-400 text-sm mb-2">Phone Number</label>
+            {isEditingPhone ? (
+              <div className="space-y-3">
+                <input
+                  type="tel"
+                  value={newPhone}
+                  onChange={(e) => setNewPhone(e.target.value)}
+                  className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:ring-1 focus:ring-accent-primary transition-all shadow-inner"
+                  placeholder="Enter phone number"
+                  autoFocus
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleUpdatePhone}
+                    disabled={isUpdatingPhone}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 primary-button disabled:opacity-50 font-bold rounded-xl transition-all shadow-md shadow-accent-primary/20"
+                  >
+                    {isUpdatingPhone ? (
+                      <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <Save className="w-4 h-4" />
+                    )}
+                    Save
+                  </button>
+                  <button
+                    onClick={handleCancelPhoneEdit}
+                    disabled={isUpdatingPhone}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-bg-elevated hover:bg-bg-secondary text-text-primary border border-border rounded-xl transition-all font-semibold"
+                  >
+                    <X className="w-4 h-4" />
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between p-4 bg-bg-secondary/50 border border-border shadow-inner rounded-xl">
+                <span className="text-text-primary font-medium">{authUser?.phoneNumber || "Not set"}</span>
+                <button
+                  onClick={() => setIsEditingPhone(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-bg-elevated hover:bg-bg-secondary text-text-primary border border-border rounded-lg transition-all text-sm font-semibold"
                 >
                   <Edit3 className="w-4 h-4" />
                   Edit
@@ -334,19 +425,19 @@ function ProfilePage({ embedded = false, onBack }) {
           {/* Email Section (Read-only) */}
           <div className="mb-6">
             <label className="block text-slate-400 text-sm mb-2">Email</label>
-            <div className="p-4 bg-slate-900/30 border border-slate-700/50 rounded-lg">
+            <div className="p-4 bg-bg-secondary/50 border border-border shadow-inner rounded-xl">
               <span className="text-slate-400">{authUser?.email}</span>
             </div>
           </div>
 
           {/* Divider */}
-          <div className="border-t border-slate-700/50 my-6"></div>
+          <div className="border-t border-border my-8"></div>
 
           {/* Password Section */}
           <div>
             <label className="block text-slate-400 text-sm mb-2">Password</label>
             {showPasswordForm ? (
-              <div className="space-y-4 p-4 bg-slate-900/30 border border-slate-700/50 rounded-lg">
+              <div className="space-y-4 p-5 bg-bg-secondary/50 border border-border shadow-inner rounded-xl">
                 {/* Current Password */}
                 <div>
                   <label className="block text-slate-500 text-xs mb-1">Current Password</label>
@@ -355,7 +446,7 @@ function ProfilePage({ embedded = false, onBack }) {
                       type={showCurrentPassword ? "text" : "password"}
                       value={passwordData.currentPassword}
                       onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                      className="w-full px-4 py-3 pr-10 bg-slate-800/50 border border-slate-600 rounded-lg text-slate-200 focus:outline-none focus:border-cyan-500 transition-colors"
+                      className="w-full px-4 py-3 pr-10 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:ring-1 focus:ring-accent-primary transition-all shadow-inner"
                       placeholder="Enter current password"
                     />
                     <button
@@ -376,7 +467,7 @@ function ProfilePage({ embedded = false, onBack }) {
                       type={showNewPassword ? "text" : "password"}
                       value={passwordData.newPassword}
                       onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-                      className="w-full px-4 py-3 pr-10 bg-slate-800/50 border border-slate-600 rounded-lg text-slate-200 focus:outline-none focus:border-cyan-500 transition-colors"
+                      className="w-full px-4 py-3 pr-10 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:ring-1 focus:ring-accent-primary transition-all shadow-inner"
                       placeholder="Enter new password (min 6 chars)"
                     />
                     <button
@@ -397,7 +488,7 @@ function ProfilePage({ embedded = false, onBack }) {
                       type={showConfirmPassword ? "text" : "password"}
                       value={passwordData.confirmPassword}
                       onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                      className="w-full px-4 py-3 pr-10 bg-slate-800/50 border border-slate-600 rounded-lg text-slate-200 focus:outline-none focus:border-cyan-500 transition-colors"
+                      className="w-full px-4 py-3 pr-10 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:ring-1 focus:ring-accent-primary transition-all shadow-inner"
                       placeholder="Confirm new password"
                     />
                     <button
@@ -415,7 +506,7 @@ function ProfilePage({ embedded = false, onBack }) {
                   <button
                     onClick={handleChangePassword}
                     disabled={isChangingPassword}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:bg-cyan-600/50 text-white rounded-lg transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 primary-button disabled:opacity-50 font-bold rounded-xl transition-all shadow-md shadow-accent-primary/20"
                   >
                     {isChangingPassword ? (
                       <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -427,7 +518,7 @@ function ProfilePage({ embedded = false, onBack }) {
                   <button
                     onClick={handleCancelPasswordChange}
                     disabled={isChangingPassword}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-bg-elevated hover:bg-bg-secondary text-text-primary border border-border rounded-xl transition-all font-semibold"
                   >
                     <X className="w-4 h-4" />
                     Cancel
@@ -435,11 +526,11 @@ function ProfilePage({ embedded = false, onBack }) {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-between p-4 bg-slate-900/30 border border-slate-700/50 rounded-lg">
-                <span className="text-slate-400">••••••••</span>
+              <div className="flex items-center justify-between p-4 bg-bg-secondary/50 border border-border shadow-inner rounded-xl">
+                <span className="text-slate-400 font-mono tracking-widest text-lg">••••••••</span>
                 <button
                   onClick={() => setShowPasswordForm(true)}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors text-sm"
+                  className="flex items-center gap-2 px-4 py-2 bg-bg-elevated hover:bg-bg-secondary text-text-primary border border-border rounded-lg transition-all text-sm font-semibold"
                 >
                   <Lock className="w-4 h-4" />
                   Change Password
@@ -449,13 +540,13 @@ function ProfilePage({ embedded = false, onBack }) {
           </div>
 
           {/* Divider */}
-          <div className="border-t border-slate-700/50 my-6"></div>
+          <div className="border-t border-border my-8"></div>
 
           {/* ChatKey Password Section */}
           <div>
             <label className="block text-slate-400 text-sm mb-2">ChatKey Password</label>
             {showChatKeyPasswordForm ? (
-              <div className="space-y-4 p-4 bg-slate-900/30 border border-slate-700/50 rounded-lg">
+              <div className="space-y-4 p-5 bg-bg-secondary/50 border border-border shadow-inner rounded-xl">
                 {/* Current ChatKey Password */}
                 <div>
                   <label className="block text-slate-500 text-xs mb-1">Current ChatKey Password</label>
@@ -464,7 +555,7 @@ function ProfilePage({ embedded = false, onBack }) {
                       type={showChatKeyCurrentPassword ? "text" : "password"}
                       value={chatKeyPasswordData.currentPassword}
                       onChange={(e) => setChatKeyPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                      className="w-full px-4 py-3 pr-10 bg-slate-800/50 border border-slate-600 rounded-lg text-slate-200 focus:outline-none focus:border-cyan-500 transition-colors"
+                      className="w-full px-4 py-3 pr-10 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:ring-1 focus:ring-accent-primary transition-all shadow-inner"
                       placeholder="Enter current ChatKey password"
                     />
                     <button
@@ -485,7 +576,7 @@ function ProfilePage({ embedded = false, onBack }) {
                       type={showChatKeyNewPassword ? "text" : "password"}
                       value={chatKeyPasswordData.newPassword}
                       onChange={(e) => setChatKeyPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-                      className="w-full px-4 py-3 pr-10 bg-slate-800/50 border border-slate-600 rounded-lg text-slate-200 focus:outline-none focus:border-cyan-500 transition-colors"
+                      className="w-full px-4 py-3 pr-10 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:ring-1 focus:ring-accent-primary transition-all shadow-inner"
                       placeholder="Enter new ChatKey password (min 6 chars)"
                     />
                     <button
@@ -506,7 +597,7 @@ function ProfilePage({ embedded = false, onBack }) {
                       type={showChatKeyConfirmPassword ? "text" : "password"}
                       value={chatKeyPasswordData.confirmPassword}
                       onChange={(e) => setChatKeyPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                      className="w-full px-4 py-3 pr-10 bg-slate-800/50 border border-slate-600 rounded-lg text-slate-200 focus:outline-none focus:border-cyan-500 transition-colors"
+                      className="w-full px-4 py-3 pr-10 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:ring-1 focus:ring-accent-primary transition-all shadow-inner"
                       placeholder="Confirm new ChatKey password"
                     />
                     <button
@@ -524,7 +615,7 @@ function ProfilePage({ embedded = false, onBack }) {
                   <button
                     onClick={handleChangeChatKeyPassword}
                     disabled={isChangingChatKeyPassword}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:bg-cyan-600/50 text-white rounded-lg transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 primary-button disabled:opacity-50 font-bold rounded-xl transition-all shadow-md shadow-accent-primary/20"
                   >
                     {isChangingChatKeyPassword ? (
                       <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -536,7 +627,7 @@ function ProfilePage({ embedded = false, onBack }) {
                   <button
                     onClick={handleCancelChatKeyPasswordChange}
                     disabled={isChangingChatKeyPassword}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-bg-elevated hover:bg-bg-secondary text-text-primary border border-border rounded-xl transition-all font-semibold"
                   >
                     <X className="w-4 h-4" />
                     Cancel
@@ -544,11 +635,11 @@ function ProfilePage({ embedded = false, onBack }) {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-between p-4 bg-slate-900/30 border border-slate-700/50 rounded-lg">
-                <span className="text-slate-400">••••••••</span>
+              <div className="flex items-center justify-between p-4 bg-bg-secondary/50 border border-border shadow-inner rounded-xl">
+                <span className="text-slate-400 font-mono tracking-widest text-lg">••••••••</span>
                 <button
                   onClick={() => setShowChatKeyPasswordForm(true)}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors text-sm"
+                  className="flex items-center gap-2 px-4 py-2 bg-bg-elevated hover:bg-bg-secondary text-text-primary border border-border rounded-lg transition-all text-sm font-semibold"
                 >
                   <Key className="w-4 h-4" />
                   Change ChatKey Password
@@ -557,8 +648,7 @@ function ProfilePage({ embedded = false, onBack }) {
             )}
           </div>
 
-          {/* Account Info */}
-          <div className="mt-8 pt-6 border-t border-slate-700/50">
+          <div className="mt-8 pt-6 border-t border-border">
             <p className="text-slate-500 text-xs text-center">
               Member since {authUser?.createdAt ? new Date(authUser.createdAt).toLocaleDateString('en-US', { 
                 year: 'numeric', 

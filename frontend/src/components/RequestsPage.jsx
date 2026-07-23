@@ -68,7 +68,7 @@ function RequestsPage({ embedded = false, onBack }) {
           <button
             type="button"
             onClick={handleBack}
-            className="feature-back-btn cursor-pointer relative z-10 flex items-center gap-2 px-3 py-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-lg transition-all min-h-[44px]"
+            className="feature-back-btn cursor-pointer relative z-10 flex items-center gap-2 px-3 py-2 text-text-muted hover:text-text-primary hover:bg-bg-secondary/50 rounded-lg transition-all min-h-[44px]"
           >
             <ArrowLeft className="w-5 h-5" />
             <span className="text-sm font-medium">Back</span>
@@ -80,12 +80,12 @@ function RequestsPage({ embedded = false, onBack }) {
           {/* Header */}
           <div className="text-center mb-6">
             <div className="flex justify-center mb-4">
-              <div className="bg-gradient-to-br from-cyan-500/20 to-blue-500/20 p-3 rounded-full">
-                <Users className="w-8 h-8 text-cyan-400" />
+              <div className="bg-accent-primary/10 p-4 rounded-full ring-4 ring-accent-primary/5">
+                <Users className="w-8 h-8 text-accent-primary" />
               </div>
             </div>
             <h1 className="text-2xl font-bold text-slate-100 mb-1">Friend Requests</h1>
-            <p className="text-slate-400 text-sm">
+            <p className="text-text-secondary text-sm">
               {loading
                 ? "Loading..."
                 : requests.length === 0
@@ -97,7 +97,7 @@ function RequestsPage({ embedded = false, onBack }) {
           {/* Content */}
           {loading ? (
             <div className="flex justify-center py-10">
-              <div className="w-8 h-8 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin" />
+              <div className="w-8 h-8 border-4 border-accent-primary/20 border-t-accent-primary rounded-full animate-spin" />
             </div>
           ) : requests.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-slate-400">
@@ -109,21 +109,21 @@ function RequestsPage({ embedded = false, onBack }) {
               {requests.map((req) => (
                 <div
                   key={req._id}
-                  className="bg-slate-700/40 border border-slate-600/30 rounded-lg p-4 flex items-center gap-4 hover:bg-slate-700/60 transition-colors"
+                  className="bg-bg-secondary/50 border border-border shadow-inner rounded-xl p-5 flex items-center gap-4 hover:bg-bg-secondary transition-all"
                 >
                   {/* Avatar */}
                   <img
                     src={req.senderId?.profilePic || "/avatar.png"}
                     alt={req.senderId?.fullName}
-                    className="w-12 h-12 rounded-full object-cover border-2 border-slate-600 flex-shrink-0"
+                    className="w-12 h-12 rounded-full object-cover border-2 border-border shadow-sm flex-shrink-0"
                   />
 
                   {/* Name + time */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-slate-100 font-medium truncate">
+                    <p className="text-text-primary font-bold truncate">
                       {req.senderId?.fullName || "Unknown user"}
                     </p>
-                    <p className="text-slate-400 text-xs mt-0.5">
+                    <p className="text-text-muted text-xs mt-0.5 font-mono">
                       {new Date(req.createdAt).toLocaleDateString(undefined, {
                         month: "short",
                         day: "numeric",

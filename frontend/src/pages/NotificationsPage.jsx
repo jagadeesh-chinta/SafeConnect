@@ -56,7 +56,7 @@ function NotificationsPage({ embedded = false, onBack }) {
           <button
             type="button"
             onClick={handleBack}
-            className="feature-back-btn cursor-pointer relative z-10 flex items-center gap-2 px-3 py-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-lg transition-all min-h-[44px]"
+            className="feature-back-btn cursor-pointer relative z-10 flex items-center gap-2 px-3 py-2 text-text-muted hover:text-text-primary hover:bg-bg-secondary/50 rounded-lg transition-all min-h-[44px]"
           >
             <ArrowLeft className="w-5 h-5" />
             <span className="text-sm font-medium">Back</span>
@@ -70,7 +70,7 @@ function NotificationsPage({ embedded = false, onBack }) {
 
           {isLoading ? (
             <div className="flex justify-center py-10">
-              <div className="w-8 h-8 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin" />
+              <div className="w-8 h-8 border-4 border-accent-primary/20 border-t-accent-primary rounded-full animate-spin" />
             </div>
           ) : notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-slate-400">
@@ -82,16 +82,16 @@ function NotificationsPage({ embedded = false, onBack }) {
               {notifications.map((item) => (
                 <div
                   key={item._id}
-                  className="bg-slate-700/40 border border-slate-600/30 rounded-lg p-4 hover:bg-slate-700/60 transition-colors"
+                  className="bg-bg-secondary/50 border border-border shadow-inner rounded-xl p-5 hover:bg-bg-secondary transition-all"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-slate-200 text-sm font-medium truncate">
+                      <p className="text-text-primary text-sm font-bold truncate">
                         {item.senderId?.fullName || "Unknown"}
                       </p>
-                      <p className="text-slate-100 mt-1 text-sm">{item.message}</p>
+                      <p className="text-text-secondary mt-1 text-sm">{item.message}</p>
                     </div>
-                    <p className="text-slate-400 text-xs whitespace-nowrap mt-0.5">
+                    <p className="text-text-muted text-xs font-mono whitespace-nowrap mt-0.5">
                       {new Date(item.createdAt).toLocaleString(undefined, {
                         month: "short",
                         day: "numeric",

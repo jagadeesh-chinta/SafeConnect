@@ -45,28 +45,28 @@ function MessageContextMenu({ x, y, onClose, onDeleteForMe, onDeleteForEveryone,
   };
 
   return createPortal(
-    <div ref={menuRef} style={style} className="chat-glass-strong rounded-lg shadow-xl py-1 min-w-[180px]">
+    <div ref={menuRef} style={style} className="glass-card rounded-xl shadow-2xl py-1.5 min-w-[200px] border border-border animate-fade-in-up">
       <button
         onClick={() => { onDeleteForMe(); onClose(); }}
-        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-200 hover:bg-white/10 transition-colors"
+        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-text-primary hover:bg-bg-secondary transition-colors"
       >
-        <TrashIcon className="w-4 h-4 text-slate-400" />
+        <TrashIcon className="w-4 h-4 text-text-muted" />
         Delete for Me
       </button>
       {canEditOrDeleteForEveryone && (
         <>
           <button
             onClick={() => { onDeleteForEveryone(); onClose(); }}
-            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-white/10 transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-danger hover:bg-bg-secondary transition-colors"
           >
             <Trash2Icon className="w-4 h-4" />
             Delete for Everyone
           </button>
           <button
             onClick={() => { onEdit(); onClose(); }}
-            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-200 hover:bg-white/10 transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-text-primary hover:bg-bg-secondary transition-colors"
           >
-            <PencilIcon className="w-4 h-4 text-slate-400" />
+            <PencilIcon className="w-4 h-4 text-text-muted" />
             Edit
           </button>
         </>

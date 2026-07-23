@@ -24,8 +24,9 @@ function FriendRequestBlock({ otherUser, status }) {
   // Case 3: Request sent by me - show "Friend Request Sent"
   if (status.status === "sent") {
     return (
-      <div className="p-4 md:p-6 text-center">
-        <p className="text-slate-200 mb-3">Friend request sent to {otherUser?.fullName}</p>
+      <div className="p-6 md:p-8 text-center bg-bg-secondary/50 m-4 md:m-6 rounded-2xl border border-border shadow-inner">
+        <p className="text-text-primary font-medium mb-3">Friend request sent to <span className="font-bold">{otherUser?.fullName}</span></p>
+        <p className="text-text-muted text-sm">Waiting for their approval.</p>
       </div>
     );
   }
@@ -61,22 +62,22 @@ function FriendRequestBlock({ otherUser, status }) {
     };
 
     return (
-      <div className="p-4 md:p-6 text-center">
-        <p className="text-slate-200 mb-4">{status.senderName} wants to be your friend</p>
-        <div className="flex gap-3 justify-center">
-          <button
-            disabled={loading}
-            onClick={handleAccept}
-            className="px-4 py-3 bg-green-600 hover:bg-green-700 rounded disabled:opacity-50 min-h-[44px]"
-          >
-            Accept
-          </button>
+      <div className="p-6 md:p-8 text-center bg-bg-secondary/50 m-4 md:m-6 rounded-2xl border border-border shadow-inner">
+        <p className="text-text-primary font-medium mb-6"><span className="font-bold">{status.senderName}</span> wants to be your friend</p>
+        <div className="flex gap-4 justify-center">
           <button
             disabled={loading}
             onClick={handleReject}
-            className="px-4 py-3 bg-red-600 hover:bg-red-700 rounded disabled:opacity-50 min-h-[44px]"
+            className="px-6 py-2.5 bg-bg-elevated text-text-primary hover:bg-danger/10 hover:text-danger border border-border rounded-xl font-semibold disabled:opacity-50 min-h-[44px] transition-colors"
           >
             Reject
+          </button>
+          <button
+            disabled={loading}
+            onClick={handleAccept}
+            className="px-6 py-2.5 bg-success text-white hover:bg-success/90 rounded-xl font-bold disabled:opacity-50 min-h-[44px] shadow-lg shadow-success/20 transition-all"
+          >
+            Accept
           </button>
         </div>
       </div>
@@ -100,12 +101,12 @@ function FriendRequestBlock({ otherUser, status }) {
     };
 
     return (
-      <div className="p-4 md:p-6 text-center">
-        <p className="text-slate-200 mb-3">You must send a friend request to start chatting</p>
+      <div className="p-6 md:p-8 text-center bg-bg-secondary/50 m-4 md:m-6 rounded-2xl border border-border shadow-inner">
+        <p className="text-text-primary font-medium mb-6">You must send a friend request to start chatting</p>
         <button
           disabled={loading}
           onClick={handleSendRequest}
-          className="px-4 py-3 bg-cyan-600 hover:bg-cyan-700 rounded disabled:opacity-50 min-h-[44px]"
+          className="primary-button px-6 py-2.5 font-bold rounded-xl disabled:opacity-50 min-h-[44px]"
         >
           Send Friend Request
         </button>

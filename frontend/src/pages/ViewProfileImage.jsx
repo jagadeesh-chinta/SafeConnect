@@ -39,11 +39,11 @@ function ViewProfileImage() {
   return (
     <div className={`feature-page chat-theme-${pageTheme} flex flex-col`}>
       {/* Header */}
-      <div className="feature-card !rounded-none border-b border-white/10 flex items-center justify-between p-4">
+      <div className="feature-card !rounded-none !border-x-0 !border-t-0 border-b border-border flex items-center justify-between p-4 z-10 relative">
         <button
           type="button"
           onClick={handleClose}
-          className="feature-back-btn flex items-center gap-2 px-3 py-2 text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 rounded-lg transition-all"
+          className="feature-back-btn flex items-center gap-2 px-3 py-2 text-text-muted hover:text-text-primary hover:bg-bg-secondary/50 rounded-lg transition-all"
         >
           <ArrowLeft className="w-5 h-5" />
           <span className="text-sm font-medium">Back to Profile</span>
@@ -53,7 +53,7 @@ function ViewProfileImage() {
           {hasCustomImage && (
             <button
               onClick={handleDownload}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors text-sm"
+              className="flex items-center gap-2 px-4 py-2 bg-bg-elevated hover:bg-bg-secondary text-text-primary border border-border rounded-lg transition-all font-semibold text-sm shadow-sm"
             >
               <Download className="w-4 h-4" />
               Download
@@ -61,7 +61,7 @@ function ViewProfileImage() {
           )}
           <button
             onClick={handleClose}
-            className="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 rounded-lg transition-all"
+            className="p-2 text-text-muted hover:text-text-primary hover:bg-bg-secondary/50 rounded-lg transition-all"
           >
             <X className="w-5 h-5" />
           </button>
@@ -74,7 +74,7 @@ function ViewProfileImage() {
           <img
             src={profileImage}
             alt="Profile Preview"
-            className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
+            className="max-w-full max-h-[80vh] object-contain rounded-2xl shadow-2xl ring-1 ring-border"
           />
         </div>
       </div>

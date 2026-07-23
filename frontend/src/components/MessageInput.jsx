@@ -241,6 +241,7 @@ function MessageInput() {
   const cancelEdit = useCallback(() => {
     setEditingMessage(null);
     setText("");
+    if (inputRef.current) inputRef.current.style.height = "auto";
   }, [setEditingMessage]);
 
   const handleUndo = useCallback(() => {
@@ -292,6 +293,7 @@ function MessageInput() {
       if (isSoundEnabled) playRandomKeyStrokeSound();
       editMessage(editingMessage._id, text.trim());
       setText("");
+      if (inputRef.current) inputRef.current.style.height = "auto";
       return;
     }
 
@@ -325,6 +327,7 @@ function MessageInput() {
     emitStopTyping();
 
     setText("");
+    if (inputRef.current) inputRef.current.style.height = "auto";
     setImagePreview("");
     setMediaFile(null);
     setMediaType(null);
@@ -433,15 +436,15 @@ function MessageInput() {
   };
 
   return (
-    <div className="p-4 border-t border-white/10 chat-glass-strong relative">
+    <div className="p-4 md:p-6 border-t border-border bg-bg-surface/50 backdrop-blur-md relative shadow-[0_-4px_24px_rgba(0,0,0,0.2)]">
       {/* Undo delete notification */}
       {deletedMessageTemp && (
-        <div className="absolute -top-10 left-0 right-0 chat-glass-strong border-b border-white/10 px-4 py-2 flex items-center justify-between text-sm text-slate-300 z-10">
+        <div className="absolute -top-12 left-0 right-0 bg-bg-surface backdrop-blur-md border-b border-border px-6 py-3 flex items-center justify-between text-sm text-text-primary z-10 shadow-sm font-medium">
           <span>Message deleted</span>
           <button
             type="button"
             onClick={handleUndo}
-            className="ripple-btn chat-btn flex items-center gap-1 text-cyan-400 hover:text-cyan-300 font-medium"
+            className="flex items-center gap-1 text-accent-primary hover:text-accent-secondary font-bold transition-colors"
           >
             <Undo2Icon className="w-3.5 h-3.5" />
             UNDO
@@ -451,9 +454,9 @@ function MessageInput() {
 
       {/* Edit mode indicator */}
       {editingMessage && !deletedMessageTemp && (
-        <div className="absolute -top-10 left-0 right-0 chat-glass-strong border-b border-white/10 px-4 py-2 flex items-center justify-between text-sm text-slate-300 z-10">
-          <span>Editing message...</span>
-          <button type="button" onClick={cancelEdit} className="text-slate-400 hover:text-slate-200 font-medium">
+        <div className="absolute -top-12 left-0 right-0 bg-bg-surface backdrop-blur-md border-b border-border px-6 py-3 flex items-center justify-between text-sm text-text-primary z-10 shadow-sm font-medium">
+          <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-accent-primary animate-pulse"></span>Editing message...</span>
+          <button type="button" onClick={cancelEdit} className="text-text-muted hover:text-text-primary font-bold transition-colors">
             Cancel
           </button>
         </div>
@@ -461,7 +464,7 @@ function MessageInput() {
 
       {/* Scheduled message indicator */}
       {scheduledDateTime && !editingMessage && !deletedMessageTemp && (
-        <div className="absolute -top-10 left-0 right-0 bg-gradient-to-r from-amber-900/80 to-amber-800/80 border-b border-amber-600/50 px-4 py-2 flex items-center justify-between text-sm text-amber-100 z-10 backdrop-blur-md">
+        <div className="absolute -top-12 left-0 right-0 bg-gradient-to-r from-warning/20 to-warning/10 border-b border-warning/30 px-6 py-3 flex items-center justify-between text-sm text-warning z-10 backdrop-blur-md font-medium">
           <span className="flex items-center gap-2">
             <ClockIcon className="w-4 h-4" />
             Scheduled for: {new Date(scheduledDateTime).toLocaleString()}
@@ -469,7 +472,7 @@ function MessageInput() {
           <button
             type="button"
             onClick={handleClearSchedule}
-            className="text-amber-300 hover:text-amber-100 font-medium"
+            className="text-warning hover:text-white font-bold transition-colors"
           >
             Clear
           </button>
@@ -486,7 +489,7 @@ function MessageInput() {
             />
             <button
               onClick={removeImage}
-              className="absolute -top-2 -right-2 w-6 h-6 rounded-full chat-glass-strong flex items-center justify-center text-slate-200 hover:bg-white/10"
+              className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-bg-elevated border border-border flex items-center justify-center text-text-secondary hover:text-danger hover:bg-danger/10 transition-all shadow-md"
               type="button"
             >
               <XIcon className="w-4 h-4" />
@@ -497,7 +500,7 @@ function MessageInput() {
 
       {mediaPreview && mediaType && (
         <div className="w-full mb-3 flex items-center">
-          <div className="relative w-full max-w-xs rounded-lg border border-white/20 p-2 chat-glass">
+          <div className="relative w-full max-w-xs rounded-xl border border-border p-2 bg-bg-secondary/80 backdrop-blur-sm shadow-md">
             {mediaType === "video" ? (
               <video
                 controls
@@ -506,22 +509,22 @@ function MessageInput() {
               />
             ) : (
               <div className="flex items-center gap-2 px-1 py-1">
-                <div className="w-8 h-8 rounded-md bg-slate-800/80 border border-white/10 flex items-center justify-center">
-                  {mediaType === "audio" ? <FileAudio2 className="w-4 h-4 text-cyan-300" /> : <FileText className="w-4 h-4 text-cyan-300" />}
+                <div className="w-10 h-10 rounded-lg bg-bg-elevated border border-border flex items-center justify-center">
+                  {mediaType === "audio" ? <FileAudio2 className="w-5 h-5 text-accent-primary" /> : <FileText className="w-5 h-5 text-accent-primary" />}
                 </div>
               </div>
             )}
             <div className="mt-2 min-w-0 px-1">
-              <p className="text-sm text-slate-100 truncate">{mediaFileName || (mediaType === "pdf" || mediaType === "document" ? "document.file" : mediaType === "video" ? "video.mp4" : "audio.mp3")}</p>
-              <p className="text-[11px] text-slate-400 uppercase tracking-wide">{mediaType} file</p>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-sm text-text-primary font-medium truncate">{mediaFileName || (mediaType === "pdf" || mediaType === "document" ? "document.file" : mediaType === "video" ? "video.mp4" : "audio.mp3")}</p>
+              <p className="text-[11px] text-text-muted uppercase tracking-wide font-semibold mt-0.5">{mediaType} file</p>
+              <p className="text-[11px] text-text-muted mt-0.5">
                 {formatFileSize(mediaFileSize) || "Size unavailable"}
                 {(mediaType === "video" || mediaType === "audio") && mediaDuration ? ` | Duration: ${formatDuration(mediaDuration)}` : ""}
               </p>
             </div>
             <button
               onClick={removeMedia}
-              className="absolute -top-2 -right-2 w-6 h-6 rounded-full chat-glass-strong flex items-center justify-center text-slate-200 hover:bg-white/10"
+              className="absolute -top-3 -right-3 w-7 h-7 rounded-full bg-bg-elevated border border-border flex items-center justify-center text-text-secondary hover:text-danger hover:bg-danger/10 transition-all shadow-md"
               type="button"
             >
               <XIcon className="w-4 h-4" />
@@ -531,7 +534,7 @@ function MessageInput() {
       )}
 
       {text.trim().length > 0 && !editingMessage && (
-        <div className="mb-2 ml-1 text-xs chat-text-muted flex items-center gap-2">
+        <div className="mb-2 ml-2 text-xs text-accent-primary font-medium flex items-center gap-2">
           Typing
           <span className="typing-dots" aria-hidden="true">
             <span />
@@ -542,22 +545,34 @@ function MessageInput() {
       )}
 
       {isUploadingMedia && (
-        <div className="mb-2 ml-1 text-[11px] text-cyan-300/90 flex items-center gap-2">
+        <div className="mb-2 ml-2 text-xs text-accent-primary font-medium flex items-center gap-2 animate-pulse">
           Uploading media {mediaUploadProgress}%
         </div>
       )}
 
-      <form onSubmit={handleSendMessage} className="w-full flex flex-wrap md:flex-nowrap gap-2 md:space-x-4 md:gap-0">
-        <input
-          type="text"
+      <form onSubmit={handleSendMessage} className="w-full flex items-end gap-2 md:gap-3 bg-bg-secondary p-1.5 md:p-2 rounded-[24px] border border-border shadow-inner">
+        <textarea
           ref={inputRef}
           value={text}
           onChange={(e) => {
             setText(e.target.value);
+            e.target.style.height = "auto";
+            e.target.style.height = Math.min(e.target.scrollHeight, 120) + "px";
             handleTypingSignal(e.target.value);
             isSoundEnabled && playRandomKeyStrokeSound();
           }}
-          className="flex-1 min-w-0 chat-glass border border-white/10 rounded-full py-2.5 px-4 md:px-5 text-white placeholder-slate-400 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#00c6ff]/60 focus:shadow-[0_0_20px_rgba(0,198,255,0.35)] transition-all"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              // Only prevent default and submit if not on a mobile touch device, 
+              // or let users use the send button. 
+              // Wait, usually on desktop Enter sends, Shift+Enter new line.
+              e.preventDefault();
+              handleSendMessage(e);
+            }
+          }}
+          rows={1}
+          style={{ height: "auto" }}
+          className="flex-1 min-w-0 bg-transparent py-3 px-4 md:px-5 text-text-primary placeholder-text-muted text-sm md:text-base focus:outline-none transition-all resize-none overflow-y-auto max-h-[120px] custom-scrollbar"
           placeholder={editingMessage ? "Edit your message..." : "Type your message..."}
         />
 
@@ -581,8 +596,8 @@ function MessageInput() {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className={`ripple-btn chat-btn chat-glass text-slate-400 hover:text-slate-200 rounded-xl px-3 md:px-4 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors ${
-              imagePreview ? "text-cyan-500" : ""
+            className={`glass-button text-text-secondary hover:text-accent-primary rounded-xl px-3 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors ${
+              imagePreview ? "text-accent-primary bg-accent-primary/10" : ""
             }`}
           >
             <ImageIcon className="w-5 h-5" />
@@ -590,8 +605,8 @@ function MessageInput() {
           <button
             type="button"
             onClick={() => mediaInputRef.current?.click()}
-            className={`ripple-btn chat-btn chat-glass text-slate-400 hover:text-slate-200 rounded-xl px-3 md:px-4 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors ${
-              mediaPreview ? "text-cyan-500" : ""
+            className={`glass-button text-text-secondary hover:text-accent-primary rounded-xl px-3 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors ${
+              mediaPreview ? "text-accent-primary bg-accent-primary/10" : ""
             }`}
             title="Attach MP4, MP3, or document"
           >
@@ -600,10 +615,10 @@ function MessageInput() {
           <button
             type="button"
             onClick={handleVoiceInput}
-            className={`ripple-btn chat-btn chat-glass rounded-xl px-3 md:px-4 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors relative ${
+            className={`glass-button rounded-xl px-3 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors relative ${
               isListening 
-                ? "text-red-500 hover:text-red-400" 
-                : "text-slate-400 hover:text-slate-200"
+                ? "text-danger bg-danger/10" 
+                : "text-text-secondary hover:text-accent-primary"
             }`}
             title={isListening ? "Stop listening" : "Voice input"}
           >
@@ -618,10 +633,10 @@ function MessageInput() {
             <button
               type="button"
               onClick={handleScheduleToggle}
-              className={`ripple-btn chat-btn chat-glass rounded-xl px-3 md:px-4 py-2 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors relative ${
+              className={`glass-button rounded-xl px-3 py-2 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors relative ${
                 scheduledDateTime
-                  ? "text-amber-400 hover:text-amber-300"
-                  : "text-slate-400 hover:text-slate-200"
+                  ? "text-warning bg-warning/10"
+                  : "text-text-secondary hover:text-accent-primary"
               }`}
               title={scheduledDateTime ? "Scheduled message" : "Schedule message"}
               disabled={editingMessage}
@@ -634,9 +649,9 @@ function MessageInput() {
 
             {/* Scheduler Popup */}
             {showScheduler && (
-              <div className="absolute bottom-full right-0 mb-2 chat-glass-strong rounded-lg shadow-xl p-4 min-w-[260px] md:min-w-[280px] z-20">
-                <div className="text-sm text-slate-300 mb-3 flex items-center gap-2">
-                  <ClockIcon className="w-4 h-4 text-amber-400" />
+              <div className="absolute bottom-full right-0 mb-4 glass-card border border-border rounded-xl shadow-2xl p-5 min-w-[280px] md:min-w-[300px] z-20 animate-fade-in-up">
+                <div className="text-sm text-text-primary font-semibold mb-4 flex items-center gap-2">
+                  <ClockIcon className="w-4 h-4 text-warning" />
                   <span>Schedule Message</span>
                 </div>
                 <input
@@ -644,13 +659,13 @@ function MessageInput() {
                   value={scheduledDateTime}
                   onChange={(e) => setScheduledDateTime(e.target.value)}
                   min={getMinDateTime()}
-                  className="w-full bg-slate-700/50 border border-white/15 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-cyan-500"
+                  className="w-full bg-bg-secondary border border-border rounded-lg py-2.5 px-3 text-text-primary text-sm focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary transition-all"
                 />
-                <div className="flex gap-2 mt-3">
+                <div className="flex gap-2 mt-4">
                   <button
                     type="button"
                     onClick={handleClearSchedule}
-                    className="ripple-btn chat-btn flex-1 px-3 py-2 text-sm text-slate-300 hover:text-slate-100 bg-slate-700/70 rounded-lg min-h-[44px]"
+                    className="flex-1 px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary bg-bg-elevated hover:bg-bg-secondary border border-border rounded-lg transition-colors min-h-[44px]"
                   >
                     Cancel
                   </button>
@@ -658,7 +673,7 @@ function MessageInput() {
                     type="button"
                     onClick={() => setShowScheduler(false)}
                     disabled={!scheduledDateTime}
-                    className="ripple-btn chat-btn flex-1 px-3 py-2 text-sm text-white bg-amber-600 hover:bg-amber-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
+                    className="primary-button flex-1 px-3 py-2.5 text-sm font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
                   >
                     Set Time
                   </button>
@@ -670,7 +685,7 @@ function MessageInput() {
           <button
             type="submit"
             disabled={(!text.trim() && !imagePreview && !mediaFile) || isUploadingMedia}
-            className="ripple-btn chat-btn bg-gradient-to-r from-[#00c6ff] to-[#00ffcc] text-[#032027] rounded-xl px-3 md:px-4 py-2 font-semibold hover:from-[#1bd0ff] hover:to-[#30ffd8] transition-all disabled:opacity-50 disabled:cursor-not-allowed min-w-[44px] min-h-[44px] flex items-center justify-center shadow-[0_10px_24px_rgba(0,198,255,0.35)]"
+            className="primary-button rounded-[16px] px-4 md:px-5 py-2 font-bold disabled:opacity-50 disabled:cursor-not-allowed min-w-[44px] min-h-[44px] flex items-center justify-center ml-1"
           >
             <SendIcon className="w-5 h-5" />
           </button>

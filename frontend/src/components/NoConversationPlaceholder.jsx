@@ -48,15 +48,15 @@ const NoConversationPlaceholder = () => {
   return (
     <div className="flex flex-col h-full">
       {/* Fixed Search Bar at Top */}
-      <div className="p-4 border-b border-white/10 chat-gradient-header chat-glass-strong">
+      <div className="p-4 md:p-6 border-b border-border bg-bg-surface/50 backdrop-blur-md">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-muted" />
           <input
             type="text"
             placeholder="Search users by name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 chat-glass rounded-full text-slate-200 placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-[#00c6ff]/50 transition-all"
+            className="w-full pl-12 pr-4 py-3 bg-bg-secondary border border-border rounded-full text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent-primary/50 transition-all shadow-inner"
           />
         </div>
       </div>
@@ -67,7 +67,7 @@ const NoConversationPlaceholder = () => {
           <div className="p-4">
             {isSearching ? (
               <div className="flex justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-primary"></div>
               </div>
             ) : searchResults.length > 0 ? (
               <div className="space-y-2">
@@ -75,10 +75,10 @@ const NoConversationPlaceholder = () => {
                   <div
                     key={user._id}
                     onClick={() => handleUserClick(user)}
-                    className="chat-list-item flex items-center gap-3 p-3 rounded-xl cursor-pointer"
+                    className="flex items-center gap-4 p-3 rounded-xl cursor-pointer hover:bg-bg-secondary transition-colors"
                   >
                     <div className={`avatar ${onlineUsers.includes(user._id) ? "online" : "offline"}`}>
-                      <div className="w-10 h-10 rounded-full overflow-hidden">
+                      <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-border">
                         <img
                           src={user.profilePic || "/avatar.png"}
                           alt={user.fullName}
@@ -87,8 +87,9 @@ const NoConversationPlaceholder = () => {
                       </div>
                     </div>
                     <div className="flex-1">
-                      <h4 className="text-slate-200 font-medium">{user.fullName}</h4>
-                      <p className="text-slate-400 text-xs">
+                      <h4 className="text-text-primary font-semibold">{user.fullName}</h4>
+                      <p className={`text-xs mt-0.5 font-medium flex items-center gap-1.5 ${onlineUsers.includes(user._id) ? "text-success" : "text-text-muted"}`}>
+                        {onlineUsers.includes(user._id) && <span className="w-1.5 h-1.5 rounded-full bg-success"></span>}
                         {onlineUsers.includes(user._id) ? "Online" : "Offline"}
                       </p>
                     </div>
@@ -96,18 +97,18 @@ const NoConversationPlaceholder = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8">
-                <p className="text-slate-400">No users found for "{searchQuery}"</p>
+              <div className="text-center py-12">
+                <p className="text-text-secondary font-medium">No users found for "{searchQuery}"</p>
               </div>
             )}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-center p-6">
-            <div className="size-20 bg-gradient-to-br from-[#00c6ff]/25 to-[#00ffcc]/15 rounded-full flex items-center justify-center mb-6 shadow-[0_10px_24px_rgba(0,198,255,0.2)]">
-              <MessageCircleIcon className="size-10 text-cyan-400" />
+            <div className="size-24 bg-accent-primary/10 rounded-full flex items-center justify-center mb-6 shadow-[0_0_32px_rgba(var(--color-accent-primary-rgb),0.15)] ring-1 ring-accent-primary/20">
+              <MessageCircleIcon className="size-12 text-accent-primary" />
             </div>
-            <h3 className="text-xl font-semibold text-slate-200 mb-2">Select a conversation</h3>
-            <p className="text-slate-400 max-w-md">
+            <h3 className="text-2xl font-bold text-text-primary mb-3">Select a conversation</h3>
+            <p className="text-text-secondary max-w-md leading-relaxed">
               Choose a contact from the sidebar or search for any user above to start chatting.
             </p>
           </div>

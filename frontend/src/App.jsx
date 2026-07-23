@@ -1,12 +1,12 @@
 import { Routes , Route, Navigate, useLocation} from "react-router";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import ChatPage from "./pages/ChatPage";
 import LoginPage from "./pages/LoginPage";
 import WelcomeScreen from "./pages/WelcomeScreen";
 import { useAuthStore } from "./store/useAuthStore";
-import { useEffect } from "react";
 import PageLoader from "./components/PageLoader";
 import {Toaster} from "react-hot-toast";
+import PhoneUpdateModal from "./components/PhoneUpdateModal";
 
 const RestoreChat = lazy(() => import("./pages/RestoreChat"));
 const ChatKeyPage = lazy(() => import("./pages/ChatKeyPage"));
@@ -16,8 +16,7 @@ const ViewProfileImage = lazy(() => import("./pages/ViewProfileImage"));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
 const RequestsPage = lazy(() => import("./components/RequestsPage"));
 
-function App()
-{
+function App() {
   const {checkAuth, isCheckingAuth, authUser} = useAuthStore();
   const location = useLocation();
   const shouldShowWelcome =
@@ -34,59 +33,89 @@ function App()
 
   useEffect(() => {
     checkAuth();
-  },[checkAuth]);
+  }, [checkAuth]);
 
   useEffect(() => {
-    const titleByPath = {
-      "/chat": "Chatify | Chat",
-      "/welcome": "Chatify | Welcome",
-      "/restore-chat": "Chatify | Restore Chat",
-      "/chatkey": "Chatify | ChatKey",
-      "/requests": "Chatify | Friend Requests",
-      "/notifications": "Chatify | Notifications",
-      "/profile": "Chatify | Profile",
-      "/profile/crop": "Chatify | Crop Profile",
-      "/profile/view-image": "Chatify | Profile Image",
-      "/login": "Chatify | Login",
-      "/signup": "Chatify | Sign Up",
+    const metadataByPath = {
+      "/chat": { title: "Chatify | Chat", description: "Start chatting with your friends securely in real-time." },
+      "/welcome": { title: "Chatify | Welcome", description: "Welcome to Chatify, the next generation secure messaging platform." },
+      "/restore-chat": { title: "Chatify | Restore Chat", description: "Restore your Chatify conversations securely using your chat keys." },
+      "/chatkey": { title: "Chatify | ChatKey", description: "Manage your BB84 quantum-generated encryption keys for maximum security." },
+      "/requests": { title: "Chatify | Friend Requests", description: "View and manage your incoming and outgoing friend requests on Chatify." },
+      "/notifications": { title: "Chatify | Notifications", description: "Stay up to date with your latest messages and alerts on Chatify." },
+      "/profile": { title: "Chatify | Profile", description: "Manage your Chatify user profile, security settings, and avatar." },
+      "/profile/crop": { title: "Chatify | Crop Profile", description: "Crop and adjust your Chatify profile picture for the perfect look." },
+      "/profile/view-image": { title: "Chatify | Profile Image", description: "View and download your high-resolution Chatify profile image." },
+      "/login": { title: "Chatify | Login", description: "Login to Chatify to start messaging securely with your network." },
+      "/signup": { title: "Chatify | Sign Up", description: "Create a new Chatify account and experience premium, secure messaging." },
     };
 
-    document.title = titleByPath[location.pathname] || "Chatify";
+    const currentMeta = metadataByPath[location.pathname] || { title: "Chatify", description: "Chatify is a secure, modern messaging app with real-time chat, ChatKey encryption utilities, notifications, and optimized performance." };
+    
+    document.title = currentMeta.title;
+    
+    // Update meta description
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute("content", currentMeta.description);
+    } else {
+      metaDescription = document.createElement('meta');
+      metaDescription.name = "description";
+      metaDescription.content = currentMeta.description;
+      document.head.appendChild(metaDescription);
+    }
   }, [location.pathname]);
 
-  if(isCheckingAuth) return <PageLoader />;
+  useEffect(() => {
+    const theme = localStorage.getItem("chatTheme") || "dark";
+    document.documentElement.setAttribute("data-theme", theme);
+  }, []);
 
-  return(
-  <div className = {`h-screen w-screen bg-slate-900 relative ${isScrollableRoute ? "overflow-y-auto overflow-x-hidden" : "overflow-hidden"}`}>
-    {/* DECORATORS - GRID BG & GLOW SHAPES */}
-    <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]" />
-    <div className="pointer-events-none absolute top-0 -left-4 size-96 bg-pink-500 opacity-20 blur-[100px]" />
-    <div className="pointer-events-none absolute bottom-0 -right-4 size-96 bg-cyan-500 opacity-20 blur-[100px]" />
-  
-    <div className="relative z-10 h-full w-full">
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
-          <Route
-            path="/"
-            element={authUser ? (shouldShowWelcome ? <Navigate to="/welcome" replace /> : <Navigate to="/chat" replace />) : <Navigate to={"/login"}/>} 
-          />
-          <Route path="/chat" element={authUser ? <ChatPage /> : <Navigate to={"/login"}/>} />
-          <Route path="/welcome" element={authUser ? <WelcomeScreen /> : <Navigate to={"/login"}/>} />
-          <Route path="/restore-chat" element={authUser ? <RestoreChat /> : <Navigate to={"/login"}/>} />
-          <Route path="/chatkey" element={authUser ? <ChatKeyPage /> : <Navigate to={"/login"}/>} />
-          <Route path="/requests" element={authUser ? <RequestsPage /> : <Navigate to={"/login"}/>} />
-          <Route path="/notifications" element={authUser ? <NotificationsPage /> : <Navigate to={"/login"}/>} />
-          <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to={"/login"}/>} />
-          <Route path="/profile/crop" element={authUser ? <CropProfileImage /> : <Navigate to={"/login"}/>} />
-          <Route path="/profile/view-image" element={authUser ? <ViewProfileImage /> : <Navigate to={"/login"}/>} />
-          <Route path="/login" element={!authUser ? <LoginPage initialMode="signin" /> : <Navigate to={shouldShowWelcome ? "/welcome" : "/chat"} replace />} />
-          <Route path="/signup" element={!authUser ? <LoginPage initialMode="signup" /> : <Navigate to={"/"} />} />
-        </Routes>
-      </Suspense>
+  if (isCheckingAuth) return <PageLoader />;
 
-      <Toaster />
+  return (
+    <div className={`h-screen w-screen relative ${isScrollableRoute ? "overflow-y-auto overflow-x-hidden custom-scrollbar" : "overflow-hidden"}`}>
+      {/* DECORATORS - NEW PREMIUM GLOWS */}
+      <div className="pointer-events-none fixed inset-0 z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-accent-primary/20 blur-[120px] animate-pulse-glow" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-accent-secondary/20 blur-[120px] animate-pulse-glow" style={{ animationDelay: '1s' }} />
+      </div>
+    
+      <div className="relative z-10 h-full w-full">
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route
+              path="/"
+              element={authUser ? (shouldShowWelcome ? <Navigate to="/welcome" replace /> : <Navigate to="/chat" replace />) : <Navigate to={"/login"}/>} 
+            />
+            <Route path="/chat" element={authUser ? <ChatPage /> : <Navigate to={"/login"}/>} />
+            <Route path="/welcome" element={authUser ? <WelcomeScreen /> : <Navigate to={"/login"}/>} />
+            <Route path="/restore-chat" element={authUser ? <RestoreChat /> : <Navigate to={"/login"}/>} />
+            <Route path="/chatkey" element={authUser ? <ChatKeyPage /> : <Navigate to={"/login"}/>} />
+            <Route path="/requests" element={authUser ? <RequestsPage /> : <Navigate to={"/login"}/>} />
+            <Route path="/notifications" element={authUser ? <NotificationsPage /> : <Navigate to={"/login"}/>} />
+            <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to={"/login"}/>} />
+            <Route path="/profile/crop" element={authUser ? <CropProfileImage /> : <Navigate to={"/login"}/>} />
+            <Route path="/profile/view-image" element={authUser ? <ViewProfileImage /> : <Navigate to={"/login"}/>} />
+            <Route path="/login" element={!authUser ? <LoginPage initialMode="signin" /> : <Navigate to={shouldShowWelcome ? "/welcome" : "/chat"} replace />} />
+            <Route path="/signup" element={!authUser ? <LoginPage initialMode="signup" /> : <Navigate to={"/"} />} />
+          </Routes>
+        </Suspense>
+
+        <PhoneUpdateModal />
+        <Toaster 
+          toastOptions={{
+            style: {
+              background: 'var(--bg-elevated)',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border)',
+              backdropFilter: 'blur(12px)',
+            }
+          }} 
+        />
+      </div>
     </div>
-  </div>
   );
 }
+
 export default App;

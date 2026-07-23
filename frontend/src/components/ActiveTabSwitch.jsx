@@ -4,14 +4,14 @@ function ActiveTabSwitch() {
   const { activeTab, setActiveTab } = useChatStore();
 
   return (
-    <div className="tabs tabs-boxed bg-transparent p-2 mx-2 md:m-2 gap-2">
+    <div className="flex p-2 mx-3 mt-4 bg-bg-secondary rounded-xl gap-1">
       <button
         onClick={() => setActiveTab("chats")}
         aria-label="Show favourites"
-        className={`tab ripple-btn chat-btn flex-1 min-h-[44px] text-sm md:text-base rounded-xl border border-white/10 ${
+        className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-300 ${
           activeTab === "chats"
-            ? "bg-gradient-to-r from-[#00c6ff]/30 to-[#00ffcc]/20 text-slate-100 shadow-[0_8px_24px_rgba(0,198,255,0.18)]"
-            : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
+            ? "bg-bg-surface text-text-primary shadow-sm"
+            : "text-text-muted hover:text-text-secondary"
         }`}
       >
         Favourites
@@ -20,10 +20,10 @@ function ActiveTabSwitch() {
       <button
         onClick={() => setActiveTab("contacts")}
         aria-label="Show contacts"
-        className={`tab ripple-btn chat-btn flex-1 min-h-[44px] text-sm md:text-base rounded-xl border border-white/10 ${
+        className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-300 ${
           activeTab === "contacts"
-            ? "bg-gradient-to-r from-[#00c6ff]/30 to-[#00ffcc]/20 text-slate-100 shadow-[0_8px_24px_rgba(0,198,255,0.18)]"
-            : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
+            ? "bg-bg-surface text-text-primary shadow-sm"
+            : "text-text-muted hover:text-text-secondary"
         }`}
       >
         Contacts

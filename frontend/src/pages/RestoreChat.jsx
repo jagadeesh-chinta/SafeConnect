@@ -180,7 +180,7 @@ function RestoreChat({ embedded = false, onBack }) {
         {/* View Chat Modal */}
         {viewingChat && chatHistory && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 md:p-4">
-            <div className="bg-slate-800 border border-slate-700 rounded-xl w-full max-w-2xl max-h-[85vh] md:max-h-[80vh] flex flex-col">
+            <div className="bg-bg-secondary border border-border rounded-xl w-full max-w-2xl max-h-[85vh] md:max-h-[80vh] flex flex-col shadow-2xl animate-scale-in">
               {/* Modal Header */}
               <div className="flex items-center justify-between p-3 md:p-4 border-b border-slate-700">
                 <div className="flex items-center gap-2 md:gap-3">
@@ -197,7 +197,7 @@ function RestoreChat({ embedded = false, onBack }) {
                 </div>
                 <button
                   onClick={closeViewChat}
-                  className="text-slate-400 hover:text-slate-200 p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                  className="text-text-muted hover:text-text-primary p-2 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -216,8 +216,8 @@ function RestoreChat({ embedded = false, onBack }) {
                         className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
                       >
                         <div
-                          className={`max-w-[70%] rounded-lg px-4 py-2 ${
-                            isOwn ? "bg-cyan-600 text-white" : "bg-slate-700 text-slate-200"
+                          className={`max-w-[70%] rounded-2xl px-4 py-2 shadow-sm ${
+                            isOwn ? "bg-accent-primary text-bg-primary rounded-br-sm" : "bg-bg-elevated text-text-primary border border-border rounded-bl-sm"
                           }`}
                         >
                           {msg.image && (
@@ -246,8 +246,8 @@ function RestoreChat({ embedded = false, onBack }) {
           {/* Title */}
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
-              <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 p-3 rounded-full">
-                <RotateCcw className="w-8 h-8 text-blue-400" />
+              <div className="bg-accent-primary/10 p-4 rounded-full ring-4 ring-accent-primary/5">
+                <RotateCcw className="w-8 h-8 text-accent-primary" />
               </div>
             </div>
             <h1 className="text-2xl font-bold text-slate-100 mb-2">Restore Deleted Chats</h1>
@@ -260,7 +260,7 @@ function RestoreChat({ embedded = false, onBack }) {
           {loading && (
             <div className="flex justify-center py-8">
               <div className="animate-spin">
-                <div className="w-8 h-8 border-4 border-blue-500/20 border-t-blue-500 rounded-full"></div>
+                <div className="w-8 h-8 border-4 border-accent-primary/20 border-t-accent-primary rounded-full"></div>
               </div>
             </div>
           )}
@@ -272,7 +272,7 @@ function RestoreChat({ embedded = false, onBack }) {
               <p className="text-slate-400 mb-4">No deleted chats found</p>
               <button
                 onClick={handleBack}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                className="primary-button px-6 py-2.5 font-bold rounded-xl"
               >
                 Go to Chats
               </button>
@@ -289,7 +289,7 @@ function RestoreChat({ embedded = false, onBack }) {
                 return (
                 <div
                   key={chat.deletedUserId}
-                  className="bg-slate-700/30 border border-slate-600/30 rounded-lg p-4"
+                  className="bg-bg-secondary/50 border border-border shadow-inner rounded-xl p-4 transition-all hover:bg-bg-secondary/70"
                 >
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 rounded-full overflow-hidden">
@@ -316,8 +316,8 @@ function RestoreChat({ embedded = false, onBack }) {
                   {/* Key Verification or Action Buttons */}
                   {!verifiedChats[chat.deletedUserId] ? (
                     // Key Verification Form
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-slate-400 text-sm">
+                    <div className="space-y-4 mt-4 pt-4 border-t border-border">
+                      <div className="flex items-center gap-2 text-text-muted text-sm font-medium">
                         <Lock className="w-4 h-4" />
                         <span>Enter shared chat key to access options</span>
                       </div>
@@ -330,13 +330,13 @@ function RestoreChat({ embedded = false, onBack }) {
                             onChange={(e) => handleKeyInputChange(chat.deletedUserId, e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && handleVerifyKey(chat.deletedUserId)}
                             placeholder="Enter 64-character shared key"
-                            className="w-full bg-slate-700/50 border border-slate-600/50 rounded-lg pl-10 pr-4 py-2 text-slate-200 text-sm placeholder-slate-500 focus:outline-none focus:border-cyan-500/50"
+                            className="w-full bg-bg-elevated border border-border rounded-xl pl-10 pr-4 py-2.5 text-text-primary text-sm placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent-primary transition-all shadow-inner"
                           />
                         </div>
                         <button
                           onClick={() => handleVerifyKey(chat.deletedUserId)}
                           disabled={verifyingKey === chat.deletedUserId}
-                          className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                          className="primary-button px-5 py-2.5 text-sm font-bold rounded-xl min-w-[80px]"
                         >
                           {verifyingKey === chat.deletedUserId ? "Verifying..." : "Verify"}
                         </button>
@@ -344,11 +344,11 @@ function RestoreChat({ embedded = false, onBack }) {
                     </div>
                   ) : (
                     // Action Buttons (shown after verification)
-                    <div className="flex gap-2 flex-wrap">
+                    <div className="flex gap-3 flex-wrap mt-4 pt-4 border-t border-border">
                       <button
                         onClick={() => handleRestoreChat(chat.deletedUserId)}
                         disabled={restoringChat === chat.deletedUserId}
-                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-success hover:bg-success/90 disabled:opacity-50 text-white text-sm font-bold rounded-xl transition-all shadow-md shadow-success/20"
                       >
                         <RotateCcw className="w-4 h-4" />
                         {restoringChat === chat.deletedUserId ? "Restoring..." : "Restore Chat"}
@@ -356,7 +356,7 @@ function RestoreChat({ embedded = false, onBack }) {
                       <button
                         onClick={() => handleDownloadPDF(chat.deletedUserId, chat.fullName)}
                         disabled={downloadingPDF === chat.deletedUserId}
-                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-bg-elevated hover:bg-bg-secondary border border-border disabled:opacity-50 text-text-primary text-sm font-semibold rounded-xl transition-colors"
                       >
                         <Download className="w-4 h-4" />
                         {downloadingPDF === chat.deletedUserId ? "Downloading..." : "Download PDF"}
@@ -364,7 +364,7 @@ function RestoreChat({ embedded = false, onBack }) {
                       <button
                         onClick={() => handleViewChat(chat.deletedUserId)}
                         disabled={loadingHistory}
-                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-slate-600 hover:bg-slate-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-bg-elevated hover:bg-bg-secondary border border-border disabled:opacity-50 text-text-primary text-sm font-semibold rounded-xl transition-colors"
                       >
                         <Eye className="w-4 h-4" />
                         {loadingHistory ? "Loading..." : "View Chat"}

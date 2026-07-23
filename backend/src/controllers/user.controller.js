@@ -43,6 +43,7 @@ export const updateUsername = async (req, res) => {
         res.status(200).json({
             _id: updatedUser._id,
             fullName: updatedUser.fullName,
+            phoneNumber: updatedUser.phoneNumber,
             email: updatedUser.email,
             profilePic: updatedUser.profilePic,
             createdAt: updatedUser.createdAt,
@@ -104,6 +105,48 @@ export const changePassword = async (req, res) => {
 };
 
 /**
+ * Update phone number
+ * PUT /user/update-phone
+ */
+export const updatePhone = async (req, res) => {
+    try {
+        const { phoneNumber } = req.body;
+        const userId = req.user._id;
+
+        // Validation: Not empty
+        if (!phoneNumber || !phoneNumber.trim()) {
+            return res.status(400).json({ message: "Phone number cannot be empty" });
+        }
+
+        const trimmedPhone = phoneNumber.trim().replace(/\D/g, "");
+
+        // Validation: Valid phone number format (7-15 digits)
+        if (!/^\d{7,15}$/.test(trimmedPhone)) {
+            return res.status(400).json({ message: "Please enter a valid phone number" });
+        }
+
+        // Update phone number
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { phoneNumber: trimmedPhone },
+            { new: true }
+        ).select('-password -chatKeyPassword');
+
+        res.status(200).json({
+            _id: updatedUser._id,
+            fullName: updatedUser.fullName,
+            phoneNumber: updatedUser.phoneNumber,
+            email: updatedUser.email,
+            profilePic: updatedUser.profilePic,
+            createdAt: updatedUser.createdAt,
+        });
+    } catch (error) {
+        console.log("Error in updatePhone controller:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+/**
  * Update avatar/profile picture
  * PUT /user/update-avatar
  */
@@ -129,6 +172,7 @@ export const updateAvatar = async (req, res) => {
         res.status(200).json({
             _id: updatedUser._id,
             fullName: updatedUser.fullName,
+            phoneNumber: updatedUser.phoneNumber,
             email: updatedUser.email,
             profilePic: updatedUser.profilePic,
             createdAt: updatedUser.createdAt,
@@ -173,6 +217,7 @@ export const deleteAvatar = async (req, res) => {
         res.status(200).json({
             _id: updatedUser._id,
             fullName: updatedUser.fullName,
+            phoneNumber: updatedUser.phoneNumber,
             email: updatedUser.email,
             profilePic: updatedUser.profilePic,
             createdAt: updatedUser.createdAt,
@@ -198,6 +243,7 @@ export const getProfile = async (req, res) => {
         res.status(200).json({
             _id: user._id,
             fullName: user.fullName,
+            phoneNumber: user.phoneNumber,
             email: user.email,
             profilePic: user.profilePic,
             createdAt: user.createdAt,

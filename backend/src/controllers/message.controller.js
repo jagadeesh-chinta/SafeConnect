@@ -171,12 +171,15 @@ export const searchUsers = async (req, res) => {
       return res.status(200).json([]);
     }
 
-    // Case-insensitive search by fullName
+    // Case-insensitive search by fullName or phoneNumber
     const users = await User.find({
       _id: { $ne: loggedInUserId },
-      fullName: { $regex: query.trim(), $options: "i" },
+      $or: [
+        { fullName: { $regex: query.trim(), $options: "i" } },
+        { phoneNumber: { $regex: query.trim(), $options: "i" } }
+      ]
     })
-      .select("fullName profilePic email")
+      .select("fullName profilePic email phoneNumber")
       .sort({ fullName: 1 })
       .lean()
       .limit(20);

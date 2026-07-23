@@ -18,7 +18,7 @@ function FeaturesSlider() {
   const [cardWidth, setCardWidth] = useState(0);
   const [isSectionVisible, setIsSectionVisible] = useState(false);
   const isAnimatingRef = useRef(false);
-  const VISIBLE_CARDS = 3;
+  const [visibleCards, setVisibleCards] = useState(() => window.innerWidth < 768 ? 1 : 3);
   const GAP_PX = 32;
   const TRANSITION_MS = 550;
 
@@ -28,7 +28,7 @@ function FeaturesSlider() {
       title: "Quantum Secure Chat",
       subtitle: "Powered by BB84 encryption",
       icon: "🔐",
-      color: "from-cyan-600 to-blue-600",
+      color: "from-accent-primary to-blue-600",
       bgImage: quantumSecure,
     },
     {
@@ -36,7 +36,7 @@ function FeaturesSlider() {
       title: "Screenshot Protection",
       subtitle: "Your privacy is always protected",
       icon: "📸",
-      color: "from-emerald-600 to-teal-600",
+      color: "from-teal-600 to-accent-primary",
       bgImage: screenshotProtection,
     },
     {
@@ -44,7 +44,7 @@ function FeaturesSlider() {
       title: "Smart Chat Restore",
       subtitle: "Restore conversations anytime",
       icon: "♻️",
-      color: "from-purple-600 to-pink-600",
+      color: "from-accent-secondary to-pink-600",
       bgImage: chatRestore,
     },
     {
@@ -52,7 +52,7 @@ function FeaturesSlider() {
       title: "Media Sharing",
       subtitle: "Send files securely",
       icon: "📁",
-      color: "from-orange-600 to-red-600",
+      color: "from-orange-500 to-red-500",
       bgImage: mediaSharing,
     },
     {
@@ -60,7 +60,7 @@ function FeaturesSlider() {
       title: "Real-Time Notifications",
       subtitle: "Instant message alerts & updates",
       icon: "🔔",
-      color: "from-indigo-600 to-purple-600",
+      color: "from-accent-primary to-accent-secondary",
       bgImage: notificationImg,
     },
     {
@@ -68,7 +68,7 @@ function FeaturesSlider() {
       title: "Friend System",
       subtitle: "Manage connections effortlessly",
       icon: "👥",
-      color: "from-rose-600 to-pink-600",
+      color: "from-rose-500 to-accent-secondary",
       bgImage: friendSystem,
     },
     {
@@ -76,7 +76,7 @@ function FeaturesSlider() {
       title: "Chat Backup",
       subtitle: "Never lose your conversations",
       icon: "☁️",
-      color: "from-blue-600 to-cyan-600",
+      color: "from-blue-600 to-accent-primary",
       bgImage: chatBackup,
     },
   ];
@@ -88,7 +88,7 @@ function FeaturesSlider() {
           if (entry.isIntersecting) {
             sectionAnimationTimeoutRef.current = setTimeout(() => {
               setIsSectionVisible(true);
-            }, 500);
+            }, 300);
           } else {
             setIsSectionVisible(false);
             if (sectionAnimationTimeoutRef.current) {
@@ -113,17 +113,25 @@ function FeaturesSlider() {
   }, []);
 
   const loopedFeatures = useMemo(
-    () => [...features, ...features.slice(0, VISIBLE_CARDS)],
-    [features, VISIBLE_CARDS]
+    () => [...features, ...features.slice(0, visibleCards)],
+    [features, visibleCards]
   );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setVisibleCards(window.innerWidth < 768 ? 1 : 3);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (!sliderViewportRef.current) return;
 
     const updateCardWidth = () => {
       const viewportWidth = sliderViewportRef.current.clientWidth;
-      const totalGapWidth = GAP_PX * (VISIBLE_CARDS - 1);
-      setCardWidth((viewportWidth - totalGapWidth) / VISIBLE_CARDS);
+      const totalGapWidth = GAP_PX * (visibleCards - 1);
+      setCardWidth((viewportWidth - totalGapWidth) / visibleCards);
     };
 
     updateCardWidth();
@@ -132,7 +140,7 @@ function FeaturesSlider() {
     resizeObserver.observe(sliderViewportRef.current);
 
     return () => resizeObserver.disconnect();
-  }, [GAP_PX, VISIBLE_CARDS]);
+  }, [GAP_PX, visibleCards]);
 
   useEffect(() => {
     if (!isAutoPlay) return;
@@ -162,7 +170,7 @@ function FeaturesSlider() {
   }, [currentIndex, features.length, TRANSITION_MS]);
 
   const moveSlide = (direction) => {
-    if (isAnimatingRef.current) return; // Prevent clicks during animation
+    if (isAnimatingRef.current) return;
     
     isAnimatingRef.current = true;
     setIsAutoPlay(false);
@@ -191,42 +199,40 @@ function FeaturesSlider() {
   return (
     <section
       ref={sliderRef}
-      className="features-section relative w-full min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col items-center justify-center px-4 md:px-8 py-20"
+      className="relative w-full min-h-screen bg-bg-primary flex flex-col items-center justify-center px-4 md:px-8 py-20 overflow-hidden"
     >
-      <div className="absolute inset-0 opacity-25">
-        <div className="absolute top-32 -left-40 w-96 h-96 bg-cyan-500/25 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 right-0 w-96 h-96 bg-emerald-500/25 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
+      <div className="absolute inset-0 opacity-20 pointer-events-none">
+        <div className="absolute top-32 -left-40 w-96 h-96 bg-accent-primary rounded-full blur-[150px]"></div>
+        <div className="absolute top-1/2 right-0 w-96 h-96 bg-accent-secondary rounded-full blur-[150px]"></div>
       </div>
 
       <div
-        className={`relative z-10 w-full max-w-6xl mx-auto transition-all duration-700 ${
-          isSectionVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+        className={`relative z-10 w-full max-w-7xl mx-auto transition-all duration-700 ease-out ${
+          isSectionVisible ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
         }`}
       >
-        {/* Header */}
         <div className="text-center mb-16 animate-fade-in-up">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-emerald-400 to-cyan-500">
-              Talk Freely, Communicate Securely
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-text-primary">
+            Talk Freely,{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-primary to-accent-secondary">
+              Communicate Securely
             </span>
           </h2>
-          <p className="text-slate-300/70 text-lg max-w-2xl mx-auto">
+          <p className="text-text-secondary text-lg max-w-2xl mx-auto">
             Experience advanced features designed for your security and privacy
           </p>
         </div>
 
-        {/* Slider Controls - Arrows on sides */}
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-6">
           <button
             onClick={() => moveSlide("prev")}
-            className="flex-shrink-0 p-3 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20 transition-all duration-300 hover:scale-110"
+            className="flex-shrink-0 p-4 rounded-full glass-button hover:scale-110 transition-all duration-300"
             aria-label="Previous"
           >
-            <ChevronLeftIcon className="w-6 h-6" />
+            <ChevronLeftIcon className="w-6 h-6 text-accent-primary" />
           </button>
 
-          <div ref={sliderViewportRef} className="flex-1 overflow-hidden">
+          <div ref={sliderViewportRef} className="flex-1 overflow-hidden px-2 py-4">
             <div
               className="flex gap-8"
               style={{
@@ -237,10 +243,10 @@ function FeaturesSlider() {
               {loopedFeatures.map((feature, index) => (
                 <div
                   key={`${feature.id}-${index}`}
-                  className={`flex-shrink-0 animate-fade-in-up transition-all duration-300 ${
+                  className={`flex-shrink-0 transition-all duration-500 ease-out ${
                     index % features.length === (currentIndex + 1) % features.length
-                      ? "scale-100"
-                      : "scale-95"
+                      ? "scale-100 opacity-100"
+                      : "scale-95 opacity-60 hover:opacity-90"
                   }`}
                   style={{
                     width: cardWidth > 0 ? `${cardWidth}px` : "calc((100% - 64px) / 3)",
@@ -248,45 +254,37 @@ function FeaturesSlider() {
                   }}
                 >
                   <div
-                    className={`relative h-96 rounded-2xl overflow-hidden cursor-pointer group shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105`}
+                    className={`relative h-[420px] rounded-[24px] overflow-hidden cursor-pointer group shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2`}
                   >
-                    {/* Background Image or Gradient */}
                     {feature.bgImage ? (
                       <>
                         <img
                           src={feature.bgImage}
                           alt={feature.title}
-                          className="absolute inset-0 w-full h-full object-cover"
+                          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
-                        {/* Dark overlay for image cards */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-slate-950/40 group-hover:from-slate-950 group-hover:via-slate-900/50 group-hover:to-slate-950/30 transition-all duration-300"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0e1a] via-[#0a0e1a]/60 to-transparent group-hover:from-[#0a0e1a] group-hover:via-[#0a0e1a]/40 transition-all duration-300"></div>
                       </>
                     ) : (
                       <>
-                        {/* Gradient background for cards without images */}
                         <div
-                          className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-85`}
+                          className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-90`}
                         ></div>
-                        {/* Overlay */}
-                        <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-all duration-300"></div>
+                        <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-all duration-300"></div>
                       </>
                     )}
 
-                    {/* Content */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6 text-center">
-                      <div className="text-6xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
+                    <div className="absolute inset-0 flex flex-col items-center justify-end text-white p-8 text-center">
+                      <div className="text-6xl mb-6 transform group-hover:-translate-y-4 transition-transform duration-500 drop-shadow-xl">
                         {feature.icon}
                       </div>
-                      <h3 className="text-2xl md:text-3xl font-bold mb-3 text-white drop-shadow-lg">
+                      <h3 className="text-2xl md:text-3xl font-bold mb-3 text-white drop-shadow-lg transform group-hover:-translate-y-2 transition-transform duration-500">
                         {feature.title}
                       </h3>
-                      <p className="text-white text-base max-w-xs drop-shadow-md leading-relaxed font-medium">
+                      <p className="text-white/90 text-base max-w-xs drop-shadow-md leading-relaxed font-medium transform group-hover:-translate-y-1 transition-transform duration-500">
                         {feature.subtitle}
                       </p>
                     </div>
-
-                    {/* Bottom Border Accent */}
-                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-white/0 via-white/80 to-white/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
                   </div>
                 </div>
               ))}
@@ -295,10 +293,10 @@ function FeaturesSlider() {
 
           <button
             onClick={() => moveSlide("next")}
-            className="flex-shrink-0 p-3 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 transition-all duration-300 hover:scale-110"
+            className="flex-shrink-0 p-4 rounded-full glass-button hover:scale-110 transition-all duration-300"
             aria-label="Next"
           >
-            <ChevronRightIcon className="w-6 h-6" />
+            <ChevronRightIcon className="w-6 h-6 text-accent-primary" />
           </button>
         </div>
       </div>

@@ -139,7 +139,7 @@ function ChatKeyPage({ embedded = false, onBack }) {
     return renderCentered(
       <div className="feature-card w-full max-w-2xl p-6 relative z-10">
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-primary"></div>
         </div>
       </div>
     );
@@ -157,13 +157,13 @@ function ChatKeyPage({ embedded = false, onBack }) {
             <ArrowLeft className="w-6 h-6" />
           </button>
           <div className="flex items-center gap-2">
-            <Lock className="w-6 h-6 text-cyan-400" />
+            <Lock className="w-6 h-6 text-accent-primary" />
             <h1 className="text-lg md:text-xl font-bold text-white">Set ChatKey Password</h1>
           </div>
         </div>
 
-        <div className="bg-slate-800/50 border border-slate-600 rounded-lg p-4 mb-6">
-          <p className="text-slate-300 text-sm">
+        <div className="bg-bg-secondary/50 border border-border rounded-xl p-5 mb-6 shadow-inner">
+          <p className="text-text-secondary text-sm">
             Protect your encryption keys with a password. You'll need this password to view your ChatKeys.
           </p>
         </div>
@@ -176,7 +176,7 @@ function ChatKeyPage({ embedded = false, onBack }) {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-slate-200 placeholder-slate-400 focus:outline-none focus:border-cyan-500 transition-colors pr-10"
+                className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent-primary transition-all shadow-inner pr-10"
                 placeholder="Enter password (min 6 characters)"
               />
               <button
@@ -196,7 +196,7 @@ function ChatKeyPage({ embedded = false, onBack }) {
                 type={showConfirmPassword ? "text" : "password"}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-slate-200 placeholder-slate-400 focus:outline-none focus:border-cyan-500 transition-colors pr-10"
+                className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent-primary transition-all shadow-inner pr-10"
                 placeholder="Confirm your password"
               />
               <button
@@ -216,7 +216,7 @@ function ChatKeyPage({ embedded = false, onBack }) {
           <button
             type="submit"
             disabled={passwordLoading}
-            className="w-full py-3 bg-cyan-600 hover:bg-cyan-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full primary-button py-3 font-bold rounded-xl shadow-lg shadow-accent-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {passwordLoading ? "Setting Password..." : "Set Password"}
           </button>
@@ -237,13 +237,13 @@ function ChatKeyPage({ embedded = false, onBack }) {
             <ArrowLeft className="w-6 h-6" />
           </button>
           <div className="flex items-center gap-2">
-            <Lock className="w-6 h-6 text-cyan-400" />
+            <Lock className="w-6 h-6 text-accent-primary" />
             <h1 className="text-lg md:text-xl font-bold text-white">Unlock ChatKeys</h1>
           </div>
         </div>
 
-        <div className="bg-slate-800/50 border border-slate-600 rounded-lg p-4 mb-6">
-          <p className="text-slate-300 text-sm">
+        <div className="bg-bg-secondary/50 border border-border rounded-xl p-5 mb-6 shadow-inner">
+          <p className="text-text-secondary text-sm">
             Enter your password to access your encryption keys.
           </p>
         </div>
@@ -256,7 +256,7 @@ function ChatKeyPage({ embedded = false, onBack }) {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-slate-200 placeholder-slate-400 focus:outline-none focus:border-cyan-500 transition-colors pr-10"
+                className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent-primary transition-all shadow-inner pr-10"
                 placeholder="Enter your password"
                 autoFocus
               />
@@ -277,7 +277,7 @@ function ChatKeyPage({ embedded = false, onBack }) {
           <button
             type="submit"
             disabled={passwordLoading}
-            className="w-full py-3 bg-cyan-600 hover:bg-cyan-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full primary-button py-3 font-bold rounded-xl shadow-lg shadow-accent-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {passwordLoading ? "Verifying..." : "Unlock"}
           </button>
@@ -298,14 +298,14 @@ function ChatKeyPage({ embedded = false, onBack }) {
           <ArrowLeft className="w-6 h-6" />
         </button>
         <div className="flex items-center gap-2">
-          <Key className="w-6 h-6 text-cyan-400" />
+          <Key className="w-6 h-6 text-accent-primary" />
           <h1 className="text-xl md:text-2xl font-bold text-white">Chat Keys</h1>
         </div>
       </div>
 
       {/* Description */}
-      <div className="bg-slate-800/50 border border-slate-600 rounded-lg p-4 mb-6">
-        <p className="text-slate-300 text-sm">
+      <div className="bg-bg-secondary/50 border border-border rounded-xl p-5 mb-6 shadow-inner">
+        <p className="text-text-secondary text-sm">
           These are your BB84 quantum-generated shared encryption keys with your friends.
           Use these keys to restore chat history or verify secure communication.
         </p>
@@ -314,7 +314,7 @@ function ChatKeyPage({ embedded = false, onBack }) {
       {/* Chat Keys List */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-primary"></div>
         </div>
       ) : chatKeys.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -329,7 +329,7 @@ function ChatKeyPage({ embedded = false, onBack }) {
           {chatKeys.map((item) => (
             <div
               key={item.friendId}
-              className="bg-slate-800/70 border border-slate-700 rounded-lg p-4 hover:border-slate-600 transition-colors"
+              className="bg-bg-secondary/50 border border-border rounded-xl p-5 hover:bg-bg-secondary transition-all shadow-sm"
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className="avatar">
@@ -349,13 +349,13 @@ function ChatKeyPage({ embedded = false, onBack }) {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <div className="flex-1 bg-slate-900/50 rounded px-3 py-2 font-mono text-xs text-cyan-400 break-all">
+              <div className="flex items-center gap-3">
+                <div className="flex-1 bg-bg-elevated border border-border rounded-lg px-3 py-2.5 font-mono text-xs text-accent-primary shadow-inner break-all">
                   {item.sharedKey}
                 </div>
                 <button
                   onClick={() => handleCopyKey(item.sharedKey, item.friendId)}
-                  className="p-2 text-slate-400 hover:text-cyan-400 hover:bg-slate-700 rounded transition-colors"
+                  className="p-2.5 text-text-muted hover:text-accent-primary hover:bg-bg-secondary rounded-lg transition-colors border border-transparent hover:border-border"
                   title="Copy key"
                 >
                   {copiedKey === item.friendId ? (

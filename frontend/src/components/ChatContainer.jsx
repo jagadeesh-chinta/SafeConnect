@@ -719,17 +719,17 @@ function ChatContainer() {
         className={`absolute inset-0 z-30 pointer-events-none transition-opacity duration-200 ${isDragOver ? "opacity-100" : "opacity-0"}`}
         aria-hidden={!isDragOver}
       >
-        <div className="w-full h-full bg-slate-950/65 backdrop-blur-[1px] flex items-center justify-center">
-          <div className="px-6 py-5 rounded-2xl border border-cyan-300/30 bg-slate-900/75 text-center shadow-xl">
-            <p className="text-cyan-200 text-lg font-semibold">Drop files to upload</p>
-            {isUploadingMedia && <p className="text-cyan-100/80 text-sm mt-2">Uploading...</p>}
+        <div className="w-full h-full bg-bg-primary/80 backdrop-blur-sm flex items-center justify-center">
+          <div className="px-8 py-6 rounded-3xl border border-accent-primary/30 bg-bg-elevated text-center shadow-2xl animate-scale-in">
+            <p className="text-accent-primary text-xl font-bold">Drop files to upload</p>
+            {isUploadingMedia && <p className="text-text-secondary text-sm mt-2 flex items-center justify-center gap-2"><span className="w-2 h-2 rounded-full bg-accent-primary animate-pulse" />Uploading...</p>}
           </div>
         </div>
       </div>
 
       <div
         ref={chatContentRef}
-        className={`relative flex-1 px-2 md:px-3 overflow-y-auto chat-scroll py-4 md:py-6 chat-no-select ${
+        className={`relative flex-1 px-3 md:px-4 overflow-y-auto custom-scrollbar py-4 md:py-6 chat-no-select ${
           isBlurred ? "chat-blur" : ""
         }`}
       >
@@ -784,12 +784,12 @@ function ChatContainer() {
                       onMouseLeave={() => setHoveredMessageId(null)}
                     >
                       <div
-                        className={`chat-bubble chat-bubble-tail ${isOwn ? "chat-bubble-tail-own" : "chat-bubble-tail-other"} relative rounded-2xl ${
+                        className={`chat-bubble chat-bubble-tail ${isOwn ? "chat-bubble-tail-own" : "chat-bubble-tail-other"} relative rounded-3xl px-4 py-3 shadow-md ${
                           isScheduled
-                            ? "bg-amber-700/80 text-amber-100 border border-amber-500/30"
+                            ? "bg-warning/20 text-warning border border-warning/30"
                             : isOwn
-                              ? "chat-bubble-own"
-                              : "chat-bubble-other"
+                              ? "bg-accent-primary text-bg-primary rounded-br-sm"
+                              : "bg-bg-elevated text-text-primary rounded-bl-sm border border-border"
                         }`}
                         onContextMenu={(e) => {
                           if (!isOwn) return;
@@ -798,8 +798,8 @@ function ChatContainer() {
                         }}
                       >
                         {isScheduled && (
-                          <div className="flex items-center gap-1 text-xs text-amber-300 mb-1 -mt-0.5">
-                            <Clock className="w-3 h-3" />
+                          <div className="flex items-center gap-1 text-xs text-warning mb-1.5 -mt-0.5 font-medium">
+                            <Clock className="w-3.5 h-3.5" />
                             <span>Scheduled</span>
                           </div>
                         )}
@@ -810,8 +810,8 @@ function ChatContainer() {
                             onClick={() => speakMessage(msg._id, msg.text)}
                             className={`absolute -right-8 top-1 p-1 rounded-full transition-all duration-200 ${
                               speakingMessageId === msg._id
-                                ? "text-cyan-400 bg-slate-700"
-                                : "text-slate-400 hover:text-cyan-400 hover:bg-slate-700"
+                                ? "text-accent-primary bg-bg-secondary"
+                                : "text-text-muted hover:text-accent-primary hover:bg-bg-secondary"
                             }`}
                             title="Listen to message"
                           >
@@ -821,22 +821,22 @@ function ChatContainer() {
 
                         {msg.image && <img src={msg.image} alt="Shared" className="rounded-lg h-48 object-cover" />}
                         {isMedia && msg.fileUrl && !isDownloaded && (
-                          <div className="mt-1 w-full max-w-xs rounded-xl border border-white/15 bg-slate-900/70 p-3">
-                            <div className="relative w-full h-28 rounded-lg overflow-hidden border border-white/10 bg-slate-800/70">
+                          <div className={`mt-1 w-full max-w-xs rounded-2xl border p-3 ${isOwn ? "bg-bg-primary/20 border-bg-primary/30" : "bg-bg-secondary/50 border-border"}`}>
+                            <div className="relative w-full h-32 rounded-xl overflow-hidden border border-border bg-bg-elevated shadow-inner">
                               {isAudio ? (
                                 <div className="w-full h-full flex items-center justify-between px-3">
                                   <div className="flex items-center gap-2">
                                     <div className="w-8 h-8 rounded-full bg-cyan-500/20 border border-cyan-300/30 flex items-center justify-center">
-                                      <FileAudio2 className="w-4 h-4 text-cyan-300" />
+                                      <FileAudio2 className="w-4 h-4 text-accent-primary" />
                                     </div>
-                                    <span className="text-xs text-slate-300">Audio file</span>
+                                    <span className="text-xs text-text-secondary font-medium">Audio file</span>
                                   </div>
-                                  <div className="flex items-end gap-1 h-8">
-                                    <span className="w-1 h-3 rounded bg-cyan-300/60" />
-                                    <span className="w-1 h-6 rounded bg-cyan-300/80" />
-                                    <span className="w-1 h-4 rounded bg-cyan-300/70" />
-                                    <span className="w-1 h-7 rounded bg-cyan-300/90" />
-                                    <span className="w-1 h-5 rounded bg-cyan-300/70" />
+                                  <div className="flex items-end gap-1 h-8 opacity-80">
+                                    <span className="w-1 h-3 rounded bg-accent-primary" />
+                                    <span className="w-1 h-6 rounded bg-accent-primary" />
+                                    <span className="w-1 h-4 rounded bg-accent-primary" />
+                                    <span className="w-1 h-7 rounded bg-accent-primary" />
+                                    <span className="w-1 h-5 rounded bg-accent-primary" />
                                   </div>
                                 </div>
                               ) : effectiveThumbnailSrc ? (
@@ -844,7 +844,7 @@ function ChatContainer() {
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center">
                                   {isThumbnailLoading ? (
-                                    <span className="text-xs text-slate-400">Generating preview...</span>
+                                    <span className="text-xs text-text-muted font-medium">Generating preview...</span>
                                   ) : isVideo ? (
                                     <video
                                       src={msg.fileUrl}
@@ -861,23 +861,23 @@ function ChatContainer() {
                                 </div>
                               )}
 
-                              <div className="absolute top-2 left-2 w-7 h-7 rounded-full bg-slate-900/75 border border-white/15 flex items-center justify-center">
+                              <div className="absolute top-2 left-2 w-8 h-8 rounded-full bg-bg-surface/80 backdrop-blur-md border border-border flex items-center justify-center shadow-sm">
                                 {isVideo ? (
-                                  <span className="text-[10px] text-slate-100">▶</span>
+                                  <span className="text-[10px] font-bold text-text-primary">▶</span>
                                 ) : isPdf ? (
-                                  <span className="text-[10px] text-slate-100">PDF</span>
+                                  <span className="text-[10px] font-bold text-text-primary">PDF</span>
                                 ) : isDocument ? (
-                                  <span className="text-[10px] text-slate-100">DOC</span>
+                                  <span className="text-[10px] font-bold text-text-primary">DOC</span>
                                 ) : (
-                                  <span className="text-[10px] text-slate-100">♪</span>
+                                  <span className="text-[10px] font-bold text-text-primary">♪</span>
                                 )}
                               </div>
                             </div>
 
                             <div className="mt-2 min-w-0">
-                              <p className="text-sm text-slate-100 truncate">{mediaFileName}</p>
-                              <p className="text-[11px] text-slate-400 uppercase tracking-wide">{mediaType} file</p>
-                              <p className="text-[11px] text-slate-400">
+                              <p className={`text-sm font-semibold truncate ${isOwn ? "text-bg-primary" : "text-text-primary"}`}>{mediaFileName}</p>
+                              <p className={`text-[11px] uppercase tracking-wider font-bold mt-0.5 ${isOwn ? "text-bg-primary/70" : "text-text-muted"}`}>{mediaType} file</p>
+                              <p className={`text-[11px] mt-0.5 ${isOwn ? "text-bg-primary/80" : "text-text-secondary"}`}>
                                 {mediaSizeText || "Size unavailable"}
                                 {durationText ? ` | Duration: ${durationText}` : ""}
                               </p>
@@ -887,7 +887,7 @@ function ChatContainer() {
                               type="button"
                               disabled={isDownloading}
                               onClick={() => downloadMedia(msg._id, msg.fileUrl, mediaType, mediaFileName)}
-                              className="mt-3 w-full rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 disabled:opacity-70 disabled:cursor-not-allowed border border-cyan-300/30 text-cyan-200 transition-colors px-3 py-2 text-sm font-medium flex items-center justify-center gap-2"
+                              className={`mt-4 w-full rounded-xl disabled:opacity-70 disabled:cursor-not-allowed transition-all px-3 py-2.5 text-sm font-bold flex items-center justify-center gap-2 ${isOwn ? "bg-bg-primary/20 hover:bg-bg-primary/30 text-bg-primary border border-bg-primary/20" : "bg-accent-primary/10 hover:bg-accent-primary/20 text-accent-primary border border-accent-primary/20"}`}
                             >
                               {isDownloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                               {isDownloading ? "Downloading..." : "Download"}
@@ -895,22 +895,22 @@ function ChatContainer() {
                           </div>
                         )}
                         {isMedia && msg.fileUrl && isDownloaded && (
-                          <div className="mt-1 w-full max-w-xs space-y-2">
-                            <div className="relative w-full h-28 rounded-lg overflow-hidden border border-white/10 bg-slate-800/70">
+                          <div className={`mt-1 w-full max-w-xs space-y-3 rounded-2xl p-3 border ${isOwn ? "bg-bg-primary/20 border-bg-primary/30" : "bg-bg-secondary/50 border-border"}`}>
+                            <div className="relative w-full h-32 rounded-xl overflow-hidden border border-border bg-bg-elevated shadow-inner">
                               {isAudio ? (
                                 <div className="w-full h-full flex items-center justify-between px-3">
                                   <div className="flex items-center gap-2">
                                     <div className="w-8 h-8 rounded-full bg-cyan-500/20 border border-cyan-300/30 flex items-center justify-center">
-                                      <FileAudio2 className="w-4 h-4 text-cyan-300" />
+                                      <FileAudio2 className="w-4 h-4 text-accent-primary" />
                                     </div>
-                                    <span className="text-xs text-slate-300">Audio file</span>
+                                    <span className="text-xs text-text-secondary font-medium">Audio file</span>
                                   </div>
-                                  <div className="flex items-end gap-1 h-8">
-                                    <span className="w-1 h-3 rounded bg-cyan-300/60" />
-                                    <span className="w-1 h-6 rounded bg-cyan-300/80" />
-                                    <span className="w-1 h-4 rounded bg-cyan-300/70" />
-                                    <span className="w-1 h-7 rounded bg-cyan-300/90" />
-                                    <span className="w-1 h-5 rounded bg-cyan-300/70" />
+                                  <div className="flex items-end gap-1 h-8 opacity-80">
+                                    <span className="w-1 h-3 rounded bg-accent-primary" />
+                                    <span className="w-1 h-6 rounded bg-accent-primary" />
+                                    <span className="w-1 h-4 rounded bg-accent-primary" />
+                                    <span className="w-1 h-7 rounded bg-accent-primary" />
+                                    <span className="w-1 h-5 rounded bg-accent-primary" />
                                   </div>
                                 </div>
                               ) : effectiveThumbnailSrc ? (
@@ -927,28 +927,28 @@ function ChatContainer() {
                                 </div>
                               )}
 
-                              <div className="absolute top-2 left-2 w-7 h-7 rounded-full bg-slate-900/75 border border-white/15 flex items-center justify-center">
+                              <div className="absolute top-2 left-2 w-8 h-8 rounded-full bg-bg-surface/80 backdrop-blur-md border border-border flex items-center justify-center shadow-sm">
                                 {isVideo ? (
-                                  <span className="text-[10px] text-slate-100">▶</span>
+                                  <span className="text-[10px] font-bold text-text-primary">▶</span>
                                 ) : isPdf ? (
-                                  <span className="text-[10px] text-slate-100">PDF</span>
+                                  <span className="text-[10px] font-bold text-text-primary">PDF</span>
                                 ) : isDocument ? (
-                                  <span className="text-[10px] text-slate-100">DOC</span>
+                                  <span className="text-[10px] font-bold text-text-primary">DOC</span>
                                 ) : (
-                                  <span className="text-[10px] text-slate-100">♪</span>
+                                  <span className="text-[10px] font-bold text-text-primary">♪</span>
                                 )}
                               </div>
                             </div>
 
                             <div className="min-w-0">
-                              <p className="text-sm text-slate-100 truncate">{mediaFileName}</p>
-                              <p className="text-[11px] text-slate-400">
+                              <p className={`text-sm font-semibold truncate ${isOwn ? "text-bg-primary" : "text-text-primary"}`}>{mediaFileName}</p>
+                              <p className={`text-[11px] mt-0.5 ${isOwn ? "text-bg-primary/80" : "text-text-secondary"}`}>
                                 {mediaSizeText || "Size unavailable"}
                                 {durationText ? ` | Duration: ${durationText}` : ""}
                               </p>
                             </div>
 
-                            <div className="text-[11px] text-emerald-300 flex items-center gap-1">
+                            <div className={`text-[11px] font-bold flex items-center gap-1 ${isOwn ? "text-bg-primary" : "text-success"}`}>
                               <CheckCircle2 className="w-3.5 h-3.5" />
                               Downloaded
                             </div>
@@ -958,7 +958,7 @@ function ChatContainer() {
                                 <button
                                   type="button"
                                   onClick={() => openPdfInNewTab(msg.fileUrl)}
-                                  className="rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-300/30 text-cyan-200 transition-colors px-3 py-2 text-xs font-medium flex items-center justify-center gap-1.5"
+                                  className={`rounded-xl transition-all px-3 py-2.5 text-xs font-bold flex items-center justify-center gap-1.5 ${isOwn ? "bg-bg-primary/20 hover:bg-bg-primary/30 text-bg-primary border border-bg-primary/20" : "bg-accent-primary/10 hover:bg-accent-primary/20 text-accent-primary border border-accent-primary/20"}`}
                                 >
                                   <ExternalLink className="w-3.5 h-3.5" />
                                   Open
@@ -966,7 +966,7 @@ function ChatContainer() {
                                 <button
                                   type="button"
                                   onClick={() => saveMediaAs(msg.fileUrl, "pdf", mediaFileName)}
-                                  className="rounded-lg bg-slate-700/70 hover:bg-slate-600/70 border border-white/10 text-slate-100 transition-colors px-3 py-2 text-xs font-medium flex items-center justify-center gap-1.5"
+                                  className={`rounded-xl transition-all px-3 py-2.5 text-xs font-bold flex items-center justify-center gap-1.5 ${isOwn ? "bg-bg-primary/10 hover:bg-bg-primary/20 text-bg-primary border border-bg-primary/10" : "bg-bg-elevated hover:bg-bg-secondary text-text-primary border border-border"}`}
                                 >
                                   <Save className="w-3.5 h-3.5" />
                                   Save As

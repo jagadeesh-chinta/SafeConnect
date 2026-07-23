@@ -130,6 +130,20 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  updatePhone: async (phoneNumber) => {
+    try {
+      const res = await axiosInstance.put("/user/update-phone", { phoneNumber });
+      set({ authUser: res.data });
+      toast.success("Phone number updated successfully");
+      return true;
+    } catch (error) {
+      console.log("Error in update phone:", error);
+      const message = error?.response?.data?.message || "Unable to update phone number";
+      toast.error(message);
+      return false;
+    }
+  },
+
   connectSocket: () => {
     const { authUser } = get();
     if (!authUser || get().socket?.connected) return;

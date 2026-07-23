@@ -164,15 +164,15 @@ function CropProfileImage() {
             <div className="space-y-4">
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-slate-600 hover:border-cyan-500 rounded-xl p-12 cursor-pointer transition-colors group"
+                className="border-2 border-dashed border-border hover:border-accent-primary rounded-xl p-12 cursor-pointer transition-colors group bg-bg-secondary/30 hover:bg-bg-secondary/50"
               >
                 <div className="flex flex-col items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-slate-700 group-hover:bg-cyan-500/20 flex items-center justify-center transition-colors">
-                    <Upload className="w-8 h-8 text-slate-400 group-hover:text-cyan-400 transition-colors" />
+                  <div className="w-16 h-16 rounded-full bg-bg-elevated group-hover:bg-accent-primary/10 flex items-center justify-center transition-all ring-4 ring-transparent group-hover:ring-accent-primary/5">
+                    <Upload className="w-8 h-8 text-text-muted group-hover:text-accent-primary transition-colors" />
                   </div>
                   <div className="text-center">
-                    <p className="text-slate-200 font-medium mb-1">Click to upload image</p>
-                    <p className="text-slate-500 text-sm">PNG, JPG, GIF up to 5MB</p>
+                    <p className="text-text-primary font-bold mb-1">Click to upload image</p>
+                    <p className="text-text-secondary text-sm">PNG, JPG, GIF up to 5MB</p>
                   </div>
                 </div>
               </div>
@@ -189,7 +189,7 @@ function CropProfileImage() {
             /* Crop Section */
             <div className="space-y-6">
               {/* Crop Area */}
-              <div className="relative w-full h-80 bg-slate-900 rounded-lg overflow-hidden">
+              <div className="relative w-full h-80 bg-bg-secondary/80 rounded-2xl overflow-hidden border border-border shadow-inner">
                 <Cropper
                   image={imageSrc}
                   crop={crop}
@@ -213,7 +213,7 @@ function CropProfileImage() {
                   step={0.1}
                   value={zoom}
                   onChange={(e) => setZoom(Number(e.target.value))}
-                  className="flex-1 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                  className="flex-1 h-2 bg-bg-elevated rounded-lg appearance-none cursor-pointer accent-accent-primary"
                 />
                 <ZoomIn className="w-5 h-5 text-slate-400" />
               </div>
@@ -223,7 +223,7 @@ function CropProfileImage() {
                 <button
                   onClick={handleSave}
                   disabled={isUploading}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-cyan-600 hover:bg-cyan-700 disabled:bg-cyan-600/50 text-white rounded-lg transition-colors font-medium"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 primary-button disabled:opacity-50 font-bold rounded-xl transition-all shadow-md shadow-accent-primary/20"
                 >
                   {isUploading ? (
                     <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -235,14 +235,14 @@ function CropProfileImage() {
                 <button
                   onClick={handleReset}
                   disabled={isUploading}
-                  className="px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors"
+                  className="px-4 py-3 bg-bg-elevated hover:bg-bg-secondary text-text-primary border border-border rounded-xl transition-all"
                 >
                   <X className="w-5 h-5" />
                 </button>
                 <button
                   onClick={handleCancel}
                   disabled={isUploading}
-                  className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors"
+                  className="px-6 py-3 bg-bg-elevated hover:bg-bg-secondary text-text-primary border border-border rounded-xl transition-all font-semibold"
                 >
                   Cancel
                 </button>

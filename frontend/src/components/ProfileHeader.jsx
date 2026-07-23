@@ -18,13 +18,13 @@ function ProfileHeader({ theme, onToggleTheme, onOpenSettings }) {
   }, [fetchUnreadCount]);
 
   return (
-    <div className="p-4 md:p-6 border-b border-white/10 chat-gradient-header chat-glass-strong">
+    <div className="p-4 md:p-6 border-b border-border bg-bg-surface/50 backdrop-blur-md">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 md:gap-3">
+        <div className="flex items-center gap-3">
           {/* AVATAR */}
-          <div className="avatar online">
+          <div className="relative">
             <button
-              className="size-10 md:size-14 rounded-full overflow-hidden relative group cursor-pointer ring-2 ring-white/10 hover:ring-[#00c6ff]/60 transition-all duration-300"
+              className="size-12 md:size-14 rounded-full overflow-hidden ring-2 ring-border hover:ring-accent-primary/60 transition-all duration-300 shadow-md"
               onClick={() => navigate("/profile")}
             >
               <img
@@ -33,41 +33,40 @@ function ProfileHeader({ theme, onToggleTheme, onOpenSettings }) {
                 className="size-full object-cover"
               />
             </button>
+            <div className="absolute bottom-0 right-0 online-dot" />
           </div>
 
           {/* USERNAME & ONLINE TEXT */}
           <div>
-            <h3 className="text-slate-200 font-medium text-sm md:text-base max-w-[120px] sm:max-w-[150px] md:max-w-[180px] truncate">
+            <h3 className="text-text-primary font-semibold text-sm md:text-base max-w-[120px] sm:max-w-[150px] md:max-w-[180px] truncate">
               {authUser.fullName}
             </h3>
-
-            <p className="text-xs flex items-center gap-1.5 chat-text-muted">
-              <span className="chat-dot-online" />
-              Online
+            <p className="text-xs flex items-center gap-1.5 text-text-muted font-medium mt-0.5">
+              <span className="text-success text-[10px]">●</span> Online
             </p>
           </div>
         </div>
 
         {/* BUTTONS */}
-        <div className="flex gap-2 md:gap-4 items-center">
+        <div className="flex gap-2 items-center">
           <button
             onClick={onToggleTheme}
-            className="ripple-btn chat-btn text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="glass-button rounded-xl p-2.5 flex items-center justify-center hover:scale-105 transition-transform"
             title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
             aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
           >
-            {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            {theme === "dark" ? <Sun className="w-5 h-5 text-text-secondary" /> : <Moon className="w-5 h-5 text-text-secondary" />}
           </button>
 
           <button
             onClick={onOpenSettings}
-            className="ripple-btn chat-btn relative text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="glass-button relative rounded-xl p-2.5 flex items-center justify-center hover:scale-105 transition-transform"
             aria-label="Open settings"
             title="Open settings"
           >
-            <MoreVertical className="w-5 h-5" />
+            <MoreVertical className="w-5 h-5 text-text-secondary" />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold flex items-center justify-center leading-none">
+              <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-[20px] px-1 rounded-full bg-danger text-white text-[10px] font-bold flex items-center justify-center shadow-sm">
                 {unreadCount > 9 ? "9+" : unreadCount}
               </span>
             )}
@@ -75,10 +74,9 @@ function ProfileHeader({ theme, onToggleTheme, onOpenSettings }) {
 
           {/* SOUND TOGGLE BTN */}
           <button
-            className="ripple-btn chat-btn text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="glass-button rounded-xl p-2.5 flex items-center justify-center hover:scale-105 transition-transform"
             onClick={() => {
-              // play click sound before toggling
-              mouseClickSound.currentTime = 0; // reset to start
+              mouseClickSound.currentTime = 0;
               mouseClickSound.play().catch((error) => console.log("Audio play failed:", error));
               toggleSound();
             }}
@@ -86,9 +84,9 @@ function ProfileHeader({ theme, onToggleTheme, onOpenSettings }) {
             title={isSoundEnabled ? "Mute sounds" : "Enable sounds"}
           >
             {isSoundEnabled ? (
-              <Volume2Icon className="size-5" />
+              <Volume2Icon className="w-5 h-5 text-accent-primary" />
             ) : (
-              <VolumeOffIcon className="size-5" />
+              <VolumeOffIcon className="w-5 h-5 text-text-muted" />
             )}
           </button>
         </div>

@@ -37,10 +37,10 @@ function ViewUserProfile({ userId, onBack }) {
     return (
       <div className={`feature-page chat-theme-${pageTheme} flex flex-col h-full`}>
         {/* Header */}
-        <div className="feature-card !rounded-none border-b border-white/10 flex items-center gap-3 px-4 md:px-6 py-4">
+        <div className="feature-card !rounded-none !border-x-0 !border-t-0 border-b border-border flex items-center gap-3 px-4 md:px-6 py-4">
           <button
             onClick={onBack}
-            className="feature-back-btn flex items-center gap-2 px-3 py-2 text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 rounded-lg transition-all min-h-[44px]"
+            className="feature-back-btn flex items-center gap-2 px-3 py-2 text-text-muted hover:text-text-primary hover:bg-bg-secondary/50 rounded-lg transition-all min-h-[44px]"
           >
             <ArrowLeft className="w-5 h-5" />
             <span className="text-sm font-medium">Back to Chat</span>
@@ -49,7 +49,7 @@ function ViewUserProfile({ userId, onBack }) {
 
         {/* Loading state */}
         <div className="flex-1 flex items-center justify-center">
-          <div className="w-10 h-10 border-3 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin" />
+          <div className="w-10 h-10 border-3 border-accent-primary/20 border-t-accent-primary rounded-full animate-spin" />
         </div>
       </div>
     );
@@ -59,10 +59,10 @@ function ViewUserProfile({ userId, onBack }) {
     return (
       <div className={`feature-page chat-theme-${pageTheme} flex flex-col h-full`}>
         {/* Header */}
-        <div className="feature-card !rounded-none border-b border-white/10 flex items-center gap-3 px-4 md:px-6 py-4">
+        <div className="feature-card !rounded-none !border-x-0 !border-t-0 border-b border-border flex items-center gap-3 px-4 md:px-6 py-4">
           <button
             onClick={onBack}
-            className="feature-back-btn flex items-center gap-2 px-3 py-2 text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 rounded-lg transition-all min-h-[44px]"
+            className="feature-back-btn flex items-center gap-2 px-3 py-2 text-text-muted hover:text-text-primary hover:bg-bg-secondary/50 rounded-lg transition-all min-h-[44px]"
           >
             <ArrowLeft className="w-5 h-5" />
             <span className="text-sm font-medium">Back to Chat</span>
@@ -71,7 +71,7 @@ function ViewUserProfile({ userId, onBack }) {
 
         {/* Error state */}
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-slate-400">Failed to load profile</p>
+          <p className="text-text-secondary">Failed to load profile</p>
         </div>
       </div>
     );
@@ -82,10 +82,10 @@ function ViewUserProfile({ userId, onBack }) {
   return (
     <div className={`feature-page chat-theme-${pageTheme} flex flex-col h-full`}>
       {/* Header */}
-      <div className="feature-card !rounded-none border-b border-white/10 flex items-center gap-3 px-4 md:px-6 py-4">
+      <div className="feature-card !rounded-none !border-x-0 !border-t-0 border-b border-border flex items-center gap-3 px-4 md:px-6 py-4">
         <button
           onClick={onBack}
-          className="feature-back-btn flex items-center gap-2 px-3 py-2 text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 rounded-lg transition-all min-h-[44px]"
+          className="feature-back-btn flex items-center gap-2 px-3 py-2 text-text-muted hover:text-text-primary hover:bg-bg-secondary/50 rounded-lg transition-all min-h-[44px]"
         >
           <ArrowLeft className="w-5 h-5" />
           <span className="text-sm font-medium">Back to Chat</span>
@@ -100,18 +100,18 @@ function ViewUserProfile({ userId, onBack }) {
             {/* Profile Icon Header */}
             <div className="text-center mb-6">
               <div className="flex justify-center mb-4">
-                <div className="bg-gradient-to-br from-cyan-500/20 to-blue-500/20 p-3 rounded-full">
-                  <User className="w-8 h-8 text-cyan-400" />
+                <div className="bg-accent-primary/10 p-4 rounded-full ring-4 ring-accent-primary/5">
+                  <User className="w-8 h-8 text-accent-primary" />
                 </div>
               </div>
               <h1 className="text-xl font-bold text-slate-100 mb-1">User Profile</h1>
-              <p className="text-slate-400 text-sm">View-only</p>
+              <p className="text-text-muted text-sm">View-only</p>
             </div>
 
             {/* Profile Picture */}
             <div className="flex justify-center mb-6">
               <div className="relative">
-                <div className={`w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 ${isOnline ? 'border-green-500' : 'border-slate-700'}`}>
+                <div className={`w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 ${isOnline ? 'border-green-500' : 'border-border'}`}>
                   <img
                     src={displayImage}
                     alt={profile.fullName}
@@ -119,24 +119,24 @@ function ViewUserProfile({ userId, onBack }) {
                   />
                 </div>
                 {/* Online indicator */}
-                <div className={`absolute bottom-1 right-1 md:bottom-2 md:right-2 w-4 h-4 rounded-full border-2 border-slate-800 ${isOnline ? 'bg-green-500' : 'bg-slate-500'}`} />
+                <div className={`absolute bottom-1 right-1 md:bottom-2 md:right-2 w-4 h-4 rounded-full border-2 border-bg-primary ${isOnline ? 'bg-green-500' : 'bg-text-muted'}`} />
               </div>
             </div>
 
             {/* Username */}
             <div className="mb-4">
-              <label className="block text-slate-400 text-sm mb-2">Username</label>
-              <div className="p-4 bg-slate-900/30 border border-slate-700/50 rounded-lg">
-                <span className="text-slate-200 font-medium">{profile.fullName}</span>
+              <label className="block text-text-secondary text-sm mb-2">Username</label>
+              <div className="p-4 bg-bg-secondary/50 border border-border shadow-inner rounded-xl">
+                <span className="text-text-primary font-medium">{profile.fullName}</span>
               </div>
             </div>
 
             {/* Status */}
             <div className="mb-4">
-              <label className="block text-slate-400 text-sm mb-2">Status</label>
-              <div className="p-4 bg-slate-900/30 border border-slate-700/50 rounded-lg flex items-center gap-2">
-                <div className={`w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-green-500' : 'bg-slate-500'}`} />
-                <span className={`font-medium ${isOnline ? 'text-green-400' : 'text-slate-400'}`}>
+              <label className="block text-text-secondary text-sm mb-2">Status</label>
+              <div className="p-4 bg-bg-secondary/50 border border-border shadow-inner rounded-xl flex items-center gap-2">
+                <div className={`w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-green-500' : 'bg-text-muted'}`} />
+                <span className={`font-medium ${isOnline ? 'text-green-400' : 'text-text-muted'}`}>
                   {isOnline ? "Online" : "Offline"}
                 </span>
               </div>
@@ -144,10 +144,10 @@ function ViewUserProfile({ userId, onBack }) {
 
             {/* Join Date */}
             <div>
-              <label className="block text-slate-400 text-sm mb-2">Joined</label>
-              <div className="p-4 bg-slate-900/30 border border-slate-700/50 rounded-lg flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-slate-500" />
-                <span className="text-slate-300">{formatJoinDate(profile.createdAt)}</span>
+              <label className="block text-text-secondary text-sm mb-2">Joined</label>
+              <div className="p-4 bg-bg-secondary/50 border border-border shadow-inner rounded-xl flex items-center gap-3">
+                <Calendar className="w-5 h-5 text-text-muted" />
+                <span className="text-text-primary">{formatJoinDate(profile.createdAt)}</span>
               </div>
             </div>
           </div>

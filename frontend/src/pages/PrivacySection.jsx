@@ -9,13 +9,9 @@ function PrivacySection() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // Animation starts immediately when section is visible
             setIsVisible(true);
-            entry.target.classList.add("animate-fade-in-up");
           } else {
-            // Reset animation when leaving the section
             setIsVisible(false);
-            entry.target.classList.remove("animate-fade-in-up");
           }
         });
       },
@@ -34,43 +30,41 @@ function PrivacySection() {
   return (
     <section
       ref={sectionRef}
-      className="privacy-section relative w-full min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-4 md:px-8 py-20"
+      className="relative w-full min-h-[70vh] bg-bg-primary flex items-center justify-center px-4 md:px-8 py-20 overflow-hidden"
     >
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-cyan-500/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-10 w-72 h-72 bg-emerald-500/20 rounded-full blur-3xl"></div>
+      <div className="absolute inset-0 opacity-50 pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-accent-primary/20 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-20 right-10 w-72 h-72 bg-accent-secondary/20 rounded-full blur-[120px]"></div>
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto text-center">
-        <div className="animate-fade-in-up">
-          <p className="text-cyan-300/60 text-sm md:text-base font-medium tracking-widest uppercase mb-6">
+        <div className={`transition-all duration-700 ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}>
+          <p className="text-accent-primary text-sm md:text-base font-semibold tracking-widest uppercase mb-6">
             Our Commitment
           </p>
 
-          <h2 className="text-4xl md:text-6xl font-bold leading-tight mb-8">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-emerald-400 to-cyan-500">
-              Privacy is not an option,
-            </span>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-8 text-text-primary">
+            Privacy is not an option,
             <br />
-            <span className="text-white">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-primary to-accent-secondary">
               it is a necessity in the digital world.
             </span>
           </h2>
 
-          <p className="text-slate-300/80 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-10">
+          <p className="text-text-secondary text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-10">
             Your conversations are yours alone. With quantum-resistant encryption and
             advanced privacy features, we ensure your data remains protected at every step.
           </p>
 
           <div className="flex flex-wrap justify-center gap-4">
-            <div className="px-6 py-3 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-300">
-              🔐 End-to-End Encrypted
+            <div className="px-6 py-3 rounded-xl glass-card text-text-primary font-medium flex items-center gap-2">
+              <span className="text-accent-primary">🔐</span> End-to-End Encrypted
             </div>
-            <div className="px-6 py-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300">
-              🛡️ Zero Knowledge Storage
+            <div className="px-6 py-3 rounded-xl glass-card text-text-primary font-medium flex items-center gap-2">
+              <span className="text-accent-primary">🛡️</span> Zero Knowledge Storage
             </div>
-            <div className="px-6 py-3 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-300">
-              ⚡ Quantum Safe
+            <div className="px-6 py-3 rounded-xl glass-card text-text-primary font-medium flex items-center gap-2">
+              <span className="text-accent-primary">⚡</span> Quantum Safe
             </div>
           </div>
         </div>

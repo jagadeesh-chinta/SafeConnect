@@ -57,8 +57,8 @@ export const signup = async (req,res)=>{
                 message: "Account created successfully. Please log in.",
                 _id: savedUser._id,
                 fullName: savedUser.fullName,
-                ehoneNumber: savedUser.phoneNumber,
-                pmail: savedUser.email,
+                phoneNumber: savedUser.phoneNumber,
+                email: savedUser.email,
                 profilePic: savedUser.profilePic,
                 createdAt: savedUser.createdAt,
             });
@@ -174,6 +174,7 @@ export const verifyOTP = async (req,res) => {
         res.status(200).json({
             _id: user._id,
             fullName: user.fullName,
+            phoneNumber: user.phoneNumber,
             email: user.email,
             profilePic: user.profilePic,
             createdAt: user.createdAt,

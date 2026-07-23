@@ -4,7 +4,8 @@ import {
     changePassword, 
     updateAvatar, 
     deleteAvatar, 
-    getProfile 
+    getProfile,
+    updatePhone
 } from "../controllers/user.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 
@@ -18,6 +19,9 @@ router.get("/profile", getProfile);
 
 // Update username
 router.put("/update-username", updateUsername);
+
+// Update phone
+router.put("/update-phone", updatePhone);
 
 // Change password
 router.put("/change-password", changePassword);
