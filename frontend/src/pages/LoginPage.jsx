@@ -319,7 +319,7 @@ function LoginPage({ initialMode = "signin" }) {
       )}
 
       {/* Hero Section */}
-      <div ref={firstSectionRef} className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-slate-950 bg-gradient-to-b from-slate-900 to-slate-950 md:bg-[url('/src/assets/security.jpg')] md:bg-cover md:bg-center bg-no-repeat">
+      <div ref={firstSectionRef} className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-[url('/src/assets/cyber-security.avif')] bg-cover bg-center bg-no-repeat md:bg-[url('/src/assets/security.jpg')]">
         {/* Overlay for readability */}
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
         
@@ -377,8 +377,8 @@ function LoginPage({ initialMode = "signin" }) {
           </aside>
 
           {/* Right Form Panel */}
-          <section className="h-full w-full md:w-1/2 lg:w-2/5 p-6 sm:p-8 flex items-center justify-center">
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 w-full max-w-md rounded-2xl p-8 animate-scale-in relative overflow-hidden shadow-2xl text-white">
+          <section className="h-full w-full md:w-1/2 lg:w-2/5 p-6 sm:p-8 flex items-center justify-center z-10 relative">
+            <div className="backdrop-blur-xl w-full max-w-md rounded-2xl p-8 animate-scale-in relative overflow-hidden shadow-2xl text-white max-md:bg-black/50 max-md:border max-md:border-cyan-500/30 max-md:shadow-[0_0_30px_rgba(6,182,212,0.15)] md:bg-white/10 md:border md:border-white/20">
               
               {/* Form Content */}
               {showOtpScreen ? (
