@@ -12,7 +12,8 @@ import {
   Eye, 
   EyeOff,
   Key,
-  Phone
+  Phone,
+  LogOut
 } from "lucide-react";
 import { axiosInstance } from "../lib/axios";
 import { useAuthStore } from "../store/useAuthStore";
@@ -22,7 +23,7 @@ function ProfilePage({ embedded = false, onBack }) {
   const navigate = useNavigate();
   const location = useLocation();
   const phoneInputRef = useRef(null);
-  const { authUser, setAuthUser, updatePhone } = useAuthStore();
+  const { authUser, setAuthUser, updatePhone, logout } = useAuthStore();
   
   useEffect(() => {
     if (location.state?.focusPhone) {
@@ -658,6 +659,24 @@ function ProfilePage({ embedded = false, onBack }) {
                 </button>
               </div>
             )}
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-border my-8"></div>
+
+          {/* Logout Section */}
+          <div>
+            <label className="block text-slate-400 text-sm mb-2">Account Actions</label>
+            <div className="flex items-center justify-between p-4 bg-bg-secondary/50 border border-border shadow-inner rounded-xl">
+              <span className="text-slate-400 font-medium">Sign out of your account</span>
+              <button
+                onClick={logout}
+                className="flex items-center gap-2 px-4 py-2 bg-danger/10 hover:bg-danger/20 text-danger border border-danger/20 rounded-lg transition-all text-sm font-semibold"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </button>
+            </div>
           </div>
 
           <div className="mt-8 pt-6 border-t border-border">

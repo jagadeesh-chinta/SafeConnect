@@ -38,6 +38,17 @@ app.use("/api/user", userRoutes);
 // compatibility: expose friend endpoints at top-level /api/* paths as well
 app.use("/api", friendRoutes);
 
+if (ENV.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+  app.get("*", (req, res) => {
+    if (req.path.startsWith("/api")) {
+      return res.status(404).json({ message: "API route not found" });
+    }
+    res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
+  });
+}
+
 // Test SMTP connection
 app.get("/api/test-smtp", async (req, res) => {
   try {
@@ -52,14 +63,6 @@ app.get("/api/test-smtp", async (req, res) => {
     res.status(500).json({success: false, message: error?.message || "SMTP connection error"});
   }
 });
-
-if (ENV.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
-
-  app.get("*", (_, res) => {
-    res.sendFile(path.join(__dirname, "../frontend","dist","index.html"));
-  });
-}
 
 server.listen(PORT, () =>{
   console.log("server running on port: " + PORT)

@@ -8,10 +8,8 @@ import { Trash2, Search, X } from "lucide-react";
 import toast from "react-hot-toast";
 
 function ContactList() {
-  const { setSelectedUser, unreadCounts, selectedUser } = useChatStore();
+  const { setSelectedUser, unreadCounts, selectedUser, friends, isFriendsLoading, getFriends } = useChatStore();
   const { onlineUsers } = useAuthStore();
-  const [friends, setFriends] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [contextMenu, setContextMenu] = useState(null);
   const [undoData, setUndoData] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -24,24 +22,9 @@ function ContactList() {
     return friends.filter(friend => friend.fullName.toLowerCase().includes(searchQuery.toLowerCase()));
   }, [friends, searchQuery]);
 
-  const fetchFriends = async () => {
-    try {
-      const res = await axiosInstance.get("/friends/list");
-      const sorted = (res.data || []).sort((a, b) =>
-        a.fullName.localeCompare(b.fullName)
-      );
-      setFriends(sorted);
-    } catch (error) {
-      console.error("Failed to fetch friends:", error);
-      setFriends([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchFriends();
-  }, []);
+    getFriends();
+  }, [getFriends]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -81,7 +64,9 @@ function ContactList() {
     const contact = contextMenu.contact;
     setContextMenu(null);
 
-    setFriends((prev) => prev.filter((f) => f._id !== contact._id));
+    // Update locally first for optimistic UI, or trigger a full refresh.
+    // For simplicity, we trigger a full refresh
+    getFriends();
 
     try {
       await axiosInstance.post(`/chat/delete/${contact._id}`);
@@ -92,7 +77,7 @@ function ContactList() {
 
       setUndoData({ contact, timeoutId });
     } catch (error) {
-      setFriends((prev) => [...prev, contact].sort((a, b) => a.fullName.localeCompare(b.fullName)));
+      getFriends();
       toast.error(error.response?.data?.message || "Failed to delete chat");
     }
   };
@@ -106,14 +91,14 @@ function ContactList() {
 
     try {
       await axiosInstance.post(`/chat/restore/${contact._id}`);
-      setFriends((prev) => [...prev, contact].sort((a, b) => a.fullName.localeCompare(b.fullName)));
+      getFriends();
       toast.success("Chat restored");
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to restore chat");
     }
   };
 
-  if (isLoading) return <UsersLoadingSkeleton />;
+  if (isFriendsLoading) return <UsersLoadingSkeleton />;
 
   if (friends.length === 0) {
     return (

@@ -40,12 +40,14 @@ const getMessagePreviewText = (message) => {
 export const useChatStore = create((set, get) => ({
   allContacts: [],
   chats: [],
+  friends: [],
   messages: [],
   activeTab: localStorage.getItem("activeTab") || "chats",
   selectedUser: JSON.parse(localStorage.getItem("selectedUser") || "null"),
   friendStatus: null, // { status: "friends"|"sent"|"received"|"not_friends", requestId?, senderName? }
   requestsRefreshTrigger: 0, // increment to trigger requests refresh
   isUsersLoading: false,
+  isFriendsLoading: false,
   isMessagesLoading: false,
   isUploadingMedia: false,
   mediaUploadProgress: 0,
@@ -553,7 +555,9 @@ export const useChatStore = create((set, get) => ({
   },
 
   getFavourites: async () => {
-    set({ isUsersLoading: true });
+    if (get().chats.length === 0) {
+      set({ isUsersLoading: true });
+    }
     try {
       const res = await axiosInstance.get("/friends/list/favourites");
       set({ chats: res.data });
@@ -562,6 +566,24 @@ export const useChatStore = create((set, get) => ({
       set({ chats: [] });
     } finally {
       set({ isUsersLoading: false });
+    }
+  },
+
+  getFriends: async () => {
+    if (get().friends.length === 0) {
+      set({ isFriendsLoading: true });
+    }
+    try {
+      const res = await axiosInstance.get("/friends/list");
+      const sorted = (res.data || []).sort((a, b) =>
+        a.fullName.localeCompare(b.fullName)
+      );
+      set({ friends: sorted });
+    } catch (error) {
+      console.error("Failed to fetch friends:", error);
+      set({ friends: [] });
+    } finally {
+      set({ isFriendsLoading: false });
     }
   },
 
