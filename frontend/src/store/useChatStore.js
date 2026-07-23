@@ -144,7 +144,9 @@ export const useChatStore = create((set, get) => ({
       const res = await axiosInstance.get("/messages/contacts");
       set({ allContacts: res.data });
     } catch (error) {
-      toast.error(error.response.data.message);
+      if (error.response?.status !== 401) {
+        toast.error(error.response?.data?.message || "Failed to load contacts");
+      }
     } finally {
       set({ isUsersLoading: false });
     }
@@ -155,7 +157,9 @@ export const useChatStore = create((set, get) => ({
       const res = await axiosInstance.get("/messages/chats");
       set({ chats: res.data });
     } catch (error) {
-      toast.error(error.response.data.message);
+      if (error.response?.status !== 401) {
+        toast.error(error.response?.data?.message || "Failed to load chats");
+      }
     } finally {
       set({ isUsersLoading: false });
     }

@@ -28,7 +28,9 @@ function RequestsPage({ embedded = false, onBack }) {
       );
       setRequests(sorted);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to load requests");
+      if (error.response?.status !== 401) {
+        toast.error(error.response?.data?.message || "Failed to load requests");
+      }
     } finally {
       setLoading(false);
     }

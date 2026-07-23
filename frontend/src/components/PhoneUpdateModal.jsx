@@ -12,29 +12,27 @@ function PhoneUpdateModal() {
     let timeoutId;
     if (
       authUser && 
-      !authUser.phoneNumber && 
-      sessionStorage.getItem("phoneUpdateAlertDismissed") !== "1"
+      !authUser.phoneNumber
     ) {
       timeoutId = setTimeout(() => {
         setIsVisible(true);
-      }, 5000);
+      }, 15000);
     } else {
       setIsVisible(false);
     }
+
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
     };
   }, [authUser]);
 
   const handleDismiss = () => {
-    sessionStorage.setItem("phoneUpdateAlertDismissed", "1");
     setIsVisible(false);
   };
 
   const handleGoToProfile = () => {
-    sessionStorage.setItem("phoneUpdateAlertDismissed", "1");
     setIsVisible(false);
-    navigate("/profile");
+    navigate("/profile", { state: { focusPhone: true } });
   };
 
   if (!isVisible) return null;

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router";
 import { 
   ArrowLeft, 
   User, 
@@ -20,8 +20,19 @@ import toast from "react-hot-toast";
 
 function ProfilePage({ embedded = false, onBack }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const phoneInputRef = useRef(null);
   const { authUser, setAuthUser, updatePhone } = useAuthStore();
   
+  useEffect(() => {
+    if (location.state?.focusPhone) {
+      setIsEditingPhone(true);
+      setTimeout(() => {
+        phoneInputRef.current?.focus();
+      }, 100);
+    }
+  }, [location.state]);
+
   // Profile image state
   const [isDeletingImage, setIsDeletingImage] = useState(false);
 
@@ -378,6 +389,7 @@ function ProfilePage({ embedded = false, onBack }) {
             {isEditingPhone ? (
               <div className="space-y-3">
                 <input
+                  ref={phoneInputRef}
                   type="tel"
                   value={newPhone}
                   onChange={(e) => setNewPhone(e.target.value)}
